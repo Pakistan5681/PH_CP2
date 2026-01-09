@@ -1,4 +1,4 @@
-def idiot_proof_general(input_statement, incorrect_input_message = "That input is invalid", output_type = "integer"):
+def idiot_proof_general(input_statement, output_type = "integer", incorrect_input_message = "That input is invalid"):
         """
         Takes user input until it is the desired output type
 
@@ -18,7 +18,7 @@ def idiot_proof_general(input_statement, incorrect_input_message = "That input i
 
                 if "-" in out:
                     isNegative = True  
-                    out.replace("-", "")
+                    out = out.replace("-", "")
 
                 if out.isdecimal():
                     if isNegative:
@@ -33,14 +33,18 @@ def idiot_proof_general(input_statement, incorrect_input_message = "That input i
                 if "." in out:
                     isDecimal = True
                     decimalLocal = out.index(".")
-                    out.replace(".", "")
+                    out = out.replace(".", "")
+
+                    if decimalLocal == 0:
+                        print(incorrect_input_message)
+                        continue
                 if "-" in out:
                     isNegative = True  
-                    out.replace("-", "")
+                    out = out.replace("-", "")
 
                 if out.isdecimal():
                     if isDecimal:
-                        insert_string(out, ".", decimalLocal)
+                        out = insert_string(out, ".", decimalLocal - 1)
                     if isNegative: 
                         return float(f"-{out}") 
                     else:
@@ -52,6 +56,20 @@ def idiot_proof_general(input_statement, incorrect_input_message = "That input i
             else: raise Exception(f"'{output_type}' is not a valid output type")
 
             print(incorrect_input_message)
+
+def idiot_proof_specific(input_statement, correct_inputs, incorrect_input_message = "That input is invalid"):
+    """
+    Takes user input until it matches one of the variables in correct_inputs (a list)
+    """
+
+    out = input(input_statement)
+
+    while not out in correct_inputs:
+        print(incorrect_input_message)
+
+        out = input(input_statement)
+
+    return out
 
 def insert_string(string, string_to_insert, index):
     """
@@ -68,5 +86,3 @@ def insert_string(string, string_to_insert, index):
     part2 = string[index:]
 
     return part1 + string_to_insert + part2
-
-print(idiot_proof_general("Give float ", "Goober", "float"))
