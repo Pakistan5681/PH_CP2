@@ -44,15 +44,20 @@ def idiot_proof_general(input_statement, output_type = "integer", incorrect_inpu
 
                 if out.isdecimal():
                     if isDecimal:
-                        out = insert_string(out, ".", decimalLocal - 1)
+                            out = insert_string(out, ".", decimalLocal - 1)
+
+                    floatToReturn = float(out)
+                    if floatToReturn < 1 and floatToReturn > -1: floatToReturn *= 10
+
                     if isNegative: 
-                        return float(f"-{out}") 
+                        return floatToReturn * -1
                     else:
-                         return float(out)
+                         return floatToReturn
 
                     
             elif output_type == "boolean":
                 out = input(input_statement).strip().lower()
+                print("This isn't done yet")
             else: raise Exception(f"'{output_type}' is not a valid output type")
 
             print(incorrect_input_message)
@@ -71,6 +76,24 @@ def idiot_proof_specific(input_statement, correct_inputs, incorrect_input_messag
 
     return out
 
+def idiot_proof_num_range(input_statement, min, max, type, incorrect_input_message = "That value is outside the accepted range"):
+    """
+    Takes user input until it is inside a certain range
+
+    min and max can be floats or integers and are inclusive
+
+    Type can either be 'float' or 'integer'
+    """
+
+    if type != "float" and type != "integer":
+        raise Exception(f"'{type}' is not a valid input type")
+
+    while True:
+        value = idiot_proof_general(input_statement, type)
+        if value >= min and value <= max:
+            return value
+        else:
+            print(incorrect_input_message)
 def insert_string(string, string_to_insert, index):
     """
     Inserts a string/character into another string after a specific index.
