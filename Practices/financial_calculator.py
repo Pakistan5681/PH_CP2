@@ -10,6 +10,7 @@ def startMenu():
 
     if codeToRun == "1": savings_time_calculator()
     elif codeToRun == "2": compund_interest_calculator()
+    elif codeToRun == "3": budget_allocator()
 
     print(" ")
 
@@ -55,11 +56,39 @@ def compund_interest_calculator():
     print(f"Starting with ${starting_amount} at {percentage}% interest, in {num_years} years you will have ${amount}")
 
 def budget_allocator():
-    category_count = pf.idiot_proof_general("How many budget categories do you have?")
+    category_count = pf.idiot_proof_general("How many budget categories do you have? ")
     categories = []
+    category_percents = []
 
     for i in range(category_count):
-        category = input(f"What is category {category_count + 1}")
+        category = input(f"What is category {i + 1}: ")
         categories.append(category)
+
+    print(" ")
+    monthly_income = round(pf.idiot_proof_general("How much do you make a month ", "float"), 2)
+
+    while True:
+        totalPercent = 0
+        category_percents = []
+        for i in categories:
+            percent = pf.idiot_proof_num_range(f"What percentage is {i} ", 1, 100, "integer")
+            totalPercent += percent
+            category_percents.append(percent)
+
+        if totalPercent <= 100:
+            break
+        else:
+            print("The percentages addup to higher than 100")
+
+    print(" ")
+    for i in range(len(categories)):
+        amountPerMonth = round(monthly_income * (category_percents[i] / 100), 3)
+        print(f"{categories[i]} is ${amountPerMonth} a month")
+
+def sales_price():
+    originalCost = pf.idiot_proof_general("What is the original cost of the item", "float")
+    percentOff = pf.idiot_proof_num_range("What is the percent discount", 1, 100, "integer")
+
+    new_price = originalCost - ((originalCost / 100) * percentOff)
 
 startMenu()

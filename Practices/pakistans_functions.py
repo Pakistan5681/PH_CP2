@@ -94,6 +94,7 @@ def idiot_proof_num_range(input_statement, min, max, type, incorrect_input_messa
             return value
         else:
             print(incorrect_input_message)
+            
 def insert_string(string, string_to_insert, index):
     """
     Inserts a string/character into another string after a specific index.
