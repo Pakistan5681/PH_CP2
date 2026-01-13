@@ -10,7 +10,7 @@ Room("Kitchen", ["Garage", "Pantry", "Family Room", "Front Room"], ),
 
 
 import pygame as py
-import Practices.pakistans_functions as pf
+import pakistans_functions as pf
 
 py.init()
 

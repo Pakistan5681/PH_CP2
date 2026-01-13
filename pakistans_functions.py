@@ -56,16 +56,27 @@ def idiot_proof_general(input_statement, output_type = "integer", incorrect_inpu
 
                     
             elif output_type == "boolean":
-                out = input(input_statement).strip().lower()
-                print("This isn't done yet")
+                out = idiot_proof_specific(input_statement, ["true", "True", "false", "False"]).strip().lower()
+                
+                if out == "false":
+                    return False
+                elif out == "true":
+                    return True
+                else:
+                    raise Exception("Something terrible has happened")
             else: raise Exception(f"'{output_type}' is not a valid output type")
 
             print(incorrect_input_message)
 
 def idiot_proof_specific(input_statement, correct_inputs, incorrect_input_message = "That input is invalid"):
     """
-    Takes user input until it matches one of the variables in correct_inputs (a list)
+    Takes user input until it matches one of the variables in correct_inputs 
+
+    correct_inputs must be a list
     """
+
+    if not isinstance(correct_inputs, list):
+        raise Exception("correct_inputs must be a list")
 
     out = input(input_statement)
 
@@ -76,7 +87,7 @@ def idiot_proof_specific(input_statement, correct_inputs, incorrect_input_messag
 
     return out
 
-def idiot_proof_num_range(input_statement, min, max, type, incorrect_input_message = "That value is outside the accepted range"):
+def idiot_proof_num_range(input_statement, min, max, type = "integer", incorrect_input_message = "That value is outside the accepted range"):
     """
     Takes user input until it is inside a certain range
 
@@ -110,3 +121,4 @@ def insert_string(string, string_to_insert, index):
     part2 = string[index:]
 
     return part1 + string_to_insert + part2
+
