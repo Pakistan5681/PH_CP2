@@ -11,6 +11,8 @@ def startMenu():
     if codeToRun == "1": savings_time_calculator()
     elif codeToRun == "2": compund_interest_calculator()
     elif codeToRun == "3": budget_allocator()
+    elif codeToRun == "4": sales_price()
+    else: tip_calculator()
 
     print(" ")
 
@@ -86,9 +88,21 @@ def budget_allocator():
         print(f"{categories[i]} is ${amountPerMonth} a month")
 
 def sales_price():
-    originalCost = pf.idiot_proof_general("What is the original cost of the item", "float")
-    percentOff = pf.idiot_proof_num_range("What is the percent discount", 1, 100, "integer")
+    print(" ")
+    originalCost = pf.idiot_proof_general("What is the original cost of the item ", "float")
+    print(" ")
+    percentOff = pf.idiot_proof_num_range("What is the percent discount ", 1, 100, "integer")
 
     new_price = originalCost - ((originalCost / 100) * percentOff)
+    print(f"The new price is ${new_price}")
+
+def tip_calculator():
+    print(" ")
+    originalCost = pf.idiot_proof_general("What is the bill ", "float")
+    print(" ")
+    tipPercent = pf.idiot_proof_num_range("What tip are you giving ", 1, 100, "integer")
+
+    new_price = (originalCost / 100) * tipPercent
+    print(f"The tip is ${new_price}")
 
 startMenu()
