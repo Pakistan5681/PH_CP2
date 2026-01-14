@@ -122,3 +122,6 @@ def insert_string(string, string_to_insert, index):
 
     return part1 + string_to_insert + part2
 
+def float_to_int(num_float):
+    num_float = round(num_float, 0)
+    return int(num_float)
