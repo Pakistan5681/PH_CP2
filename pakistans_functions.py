@@ -87,6 +87,25 @@ def idiot_proof_specific(input_statement, correct_inputs, incorrect_input_messag
 
     return out
 
+def idiot_proof_exclude(input_statement, incorrect_inputs, incorrect_input_message = "That input is invalid"):
+    """
+    Takes user input until it does not match one of the variables in incorrect_inputs 
+
+    incorrect_inputs must be a list
+    """
+
+    if not isinstance(incorrect_inputs, list):
+        raise Exception("correct_inputs must be a list")
+
+    out = input(input_statement)
+
+    while out in incorrect_inputs:
+        print(incorrect_input_message)
+
+        out = input(input_statement)
+
+    return out
+
 def idiot_proof_num_range(input_statement, min, max, type = "integer", incorrect_input_message = "That value is outside the accepted range"):
     """
     Takes user input until it is inside a certain range
