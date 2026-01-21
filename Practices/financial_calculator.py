@@ -1,4 +1,4 @@
-import pakistans_functions as pf 
+import Practices.pakistans_functions as pf 
 
 def startMenu(): 
     print("1. Savings Time Calculator") 
