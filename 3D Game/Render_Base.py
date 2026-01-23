@@ -127,6 +127,17 @@ class Face:
 
             pixels[min_x:max_x, min_y:max_y][mask.T] = self.color
 
+    def drawSimple(self, projectMatrix, screen):
+        pointOne = self.vertOne.project(projectMatrix, screen.get_width(), screen.get_height())
+        pointTwo = self.vertTwo.project(projectMatrix, screen.get_width(), screen.get_height())
+        pointThree = self.vertThree.project(projectMatrix, screen.get_width(), screen.get_height())
+        a = (pointOne[0], pointOne[1])
+        b = (pointTwo[0], pointTwo[1])
+        c = (pointThree[0], pointThree[1])
+        
+        py.draw.polygon(screen, self.color, [a, b, c])
+
+
     def retrunZaverage(self):
         vertZ = 0
 
@@ -151,7 +162,6 @@ class Shape:
     def draw(self, screen, projectMatrix):
         zPositions = []
         zConnections = {}
-        allPixels = []
 
         for i in self.faces:
             zPositions.append(i.retrunZaverage())
@@ -160,7 +170,7 @@ class Shape:
         zPositions.sort()
 
         for i in zPositions:
-            zConnections[i].draw(projectMatrix, screen)
+            zConnections[i].drawSimple(projectMatrix, screen)
 
     def returnZAverage(self):
         vertZ = 0
