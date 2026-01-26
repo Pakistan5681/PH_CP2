@@ -1,27 +1,39 @@
 from random import choice, randint
 import pakistans_functions as pf
 
+def main():
+    while True:
+        get_input_for_password()
+        continueProgram = pf.idiot_proof_yes_no("Would you like to continue using the program ")
+
+        if not continueProgram:
+            print("Exiting program")
+            break
+
 def get_input_for_password():
     length = pf.idiot_proof_general("How many characters do you want in your password ")
-    includeLower = pf.idiot_proof_yes_no("Include lowercase? ")
-    includeUpper = pf.idiot_proof_yes_no("Include uppercase? ")
-    includeNumber = pf.idiot_proof_yes_no("Include number? ")
-    includeSpecial = pf.idiot_proof_yes_no("Include special character? ")
+    includeLower = pf.idiot_proof_yes_no("Require lowercase? ")
+    includeUpper = pf.idiot_proof_yes_no("Require uppercase? ")
+    includeNumber = pf.idiot_proof_yes_no("Require number? ")
+    includeSpecial = pf.idiot_proof_yes_no("Require special character? ")
 
     print("Possibilites:")
     print(" ")
+    for i in range(4):
+        print(generate_password(length, includeLower, includeUpper, includeNumber, includeSpecial))
+        print(" ")
 
 def generate_password(length, needs_lowercase, needs_uppercase, needs_number, needs_spec_chars): #actually generates the code
     possibilites = []
     password = ""
-    removeAmount = 0
+    removeAmount = 0 # used to make sure the right amount of default characters are added to possibilites
 
     if needs_lowercase: removeAmount += 1
     if needs_uppercase: removeAmount += 1
     if needs_number: removeAmount += 1
     if needs_spec_chars: removeAmount += 1
 
-    for i in range(length - removeAmount): possibilites.append("reg")
+    for i in range(length - removeAmount): possibilites.append("reg") # removes a default character for every specific character added
     if needs_lowercase: possibilites.append("lower")
     if needs_uppercase: possibilites.append("upper")
     if needs_number: possibilites.append("num")
@@ -48,7 +60,6 @@ def generate_password(length, needs_lowercase, needs_uppercase, needs_number, ne
         else:
             password += generate_standard_character()
 
-        print(possibilites)
     return password
             
 
@@ -72,4 +83,4 @@ def generate_special(): # generates a random special character using ascii
     char_code = randint(35, 47)
     return chr(char_code)
 
-print(generate_password(5, True, True, True, True))
+main()

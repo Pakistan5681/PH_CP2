@@ -130,6 +130,8 @@ def idiot_proof_yes_no(input_statement, incorrect_input_message = "Answer 'yes' 
     Takes in user input and returns a bool
 
     Returns True for "yes" and False for "no"
+
+    Automatically sets input to lowercase and accepts y/n
     """
 
     while True:
