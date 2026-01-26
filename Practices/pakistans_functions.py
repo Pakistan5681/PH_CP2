@@ -124,7 +124,25 @@ def idiot_proof_num_range(input_statement, min, max, type = "integer", incorrect
             return value
         else:
             print(incorrect_input_message)
-            
+
+def idiot_proof_yes_no(input_statement, incorrect_input_message = "Answer 'yes' or 'no'"):
+    """
+    Takes in user input and returns a bool
+
+    Returns True for "yes" and False for "no"
+    """
+
+    while True:
+        user_input = input(input_statement).strip().lower()
+
+        if user_input == "yes" or user_input == "y":
+            return True
+        elif user_input == "no" or user_input == "n":
+            return False
+        else:
+            print(incorrect_input_message)
+            print(" ")
+
 def insert_string(string, string_to_insert, index):
     """
     Inserts a string/character into another string after a specific index.
@@ -140,6 +158,7 @@ def insert_string(string, string_to_insert, index):
     part2 = string[index:]
 
     return part1 + string_to_insert + part2
+
 
 def float_to_int(num_float):
     num_float = round(num_float, 0)
