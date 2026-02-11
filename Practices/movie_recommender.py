@@ -51,24 +51,27 @@ def search_or_recommend():
             filters[4] = (legnthMin, legnthMax)
 
         potentail_films = []
+
         for row in reader:
             potentail_films.append(", ".join(row))
-
-        
 
         if 1 in filters.keys():
             for row in reader:
                 if  "/" in row[2]: genres = row[2].split("/")
-                else: genres= row[2]
+                else: genres= [row[2]]
 
-                print(row[2])
-
-                if not row[2] in genres:
+                if not genreToAdd in genres:
                     genres = row
                     potentail_films.remove(", ".join(row))
 
-        for i in potentail_films:
-            print(i)
+        if 2 in filters.keys():
+            file.seek(0)
+            reader2 = csv.reader(file)
+            for row in reader2:
+                directors = row[1].split(", ")
+
+#        for i in potentail_films:
+#            print(i)
             
 
 
