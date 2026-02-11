@@ -31,7 +31,7 @@ def search_or_recommend():
         print("3. Actor")
         print("4. Length")
 
-        search_method = input("Choose your filters ")
+        search_method = input("Choose your filters ").replace(" ", "")
         filters_raw = search_method.split(",")
         filters = {}
 

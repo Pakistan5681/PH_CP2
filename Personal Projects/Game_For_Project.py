@@ -1,5 +1,6 @@
 import pygame as py
 from random import randint
+from time import sleep
 
 py.init()
 
@@ -12,6 +13,7 @@ GREEN = (0, 255, 0)
 BROWN = (155, 118, 83)
 PLAYER_COLOR = (242, 177, 97)
 SKY_BLUE = (135, 206, 235)
+YELLOW = (255, 255, 0)
 
 running = True
 
@@ -27,6 +29,7 @@ fps = 60
 max_fps = 500
 
 score = 0
+highScore = 0
 
 font = py.font.Font(None, 36)
 
@@ -50,6 +53,21 @@ touchingGround = True
 
 spawnTimer = 0
 spawnEveryXFrames = 90
+
+def endGame():
+    text_surface = font.render("3", True, BLACK)
+    screen.blit(text_surface, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100, 100))
+    sleep(1)
+    text_surface = font.render("2", True, BLACK)
+    screen.blit(text_surface, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100, 100))
+    sleep(1)
+    text_surface = font.render("1", True, BLACK)
+    screen.blit(text_surface, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100, 100))
+    sleep(1)
+    return score, highScore
+
+with open("Personal Projects\scoreSaver.txt", "r") as file:
+    highScore = int(file.read())
 
 while running:
     screen.fill(SKY_BLUE)
@@ -86,6 +104,8 @@ while running:
     py.draw.rect(screen, BROWN, (0, ground, SCREEN_WIDTH, ground)); py.draw.rect(screen, GREEN, (0, ground, SCREEN_WIDTH, ground / 15))
     py.draw.rect(screen, PLAYER_COLOR, player_rect)
 
+    py.draw.ellipse(screen, YELLOW, (1800, 100, 100, 100))
+
     spawnTimer += 1
 
     if spawnTimer == spawnEveryXFrames:
@@ -100,8 +120,14 @@ while running:
             SPIKE_HEIGHT
         ))
 
-    text_surface = font.render('Hello World!', True, BLACK)
+    text_surface = font.render(str(score), True, BLACK)
+    text_surface_two = font.render(str(highScore), True, YELLOW)
+
     screen.blit(text_surface, (100, 100, 100, 100))
+    screen.blit(text_surface_two, (100, 200, 100, 100))
+
+    if score > highScore:
+        highScore = score
 
 
     for i in spike_colliders:
@@ -109,23 +135,33 @@ while running:
             running = False
 
     for i in range(len(hazards)):
-        hazards[i] -= moveSpeed
+        if len(hazards) - 1 >= i:
+            hazards[i] -= moveSpeed
 
-        spike_rect = py.Rect(
-            hazards[i] - SPIKE_WIDTH,
-            ground - SPIKE_HEIGHT,
-            SPIKE_WIDTH,
-            SPIKE_HEIGHT
-        )
+            spike_rect = py.Rect(
+                hazards[i] - SPIKE_WIDTH,
+                ground - SPIKE_HEIGHT,
+                SPIKE_WIDTH,
+                SPIKE_HEIGHT
+            )
 
-        py.draw.rect(screen, RED, spike_rect)
+            py.draw.rect(screen, RED, spike_rect)
 
-        if player_rect.colliderect(spike_rect):
-            running = False        
+            if player_rect.colliderect(spike_rect):
+                running = False        
 
-        if hazards[i] < PLAYER_X
+            if hazards[i] == PLAYER_X:
+                score += 1
+            if hazards[i] < -100:
+                hazards.remove(hazards[i])
 
     if fps < max_fps: fps += 0.05
 
-    py.display.flip()
+    if running: py.display.flip()
+
+endGame()
+
+with open("Personal Projects\scoreSaver.txt", "w") as file:
+    file.write(str(highScore))
+
 
