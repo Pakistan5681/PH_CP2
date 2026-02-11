@@ -18,6 +18,8 @@ def menu():
                 print_list()
             case 3:
                 break
+        
+        print(" ")
 
 
 def search_or_recommend():
@@ -47,8 +49,8 @@ def search_or_recommend():
         
         if "4" in filters_raw:
             legnthMin = pf.idiot_proof_general("What is the shortest time (in minutes) the movie can be ")
-            legnthMax = pf.idiot_proof_general("What is the longest time (in minutes) the movie can be ")
-            filters[4] = (legnthMin, legnthMax)
+            lengthMax = pf.idiot_proof_general("What is the longest time (in minutes) the movie can be ")
+            filters[4] = (legnthMin, lengthMax)
 
         potentail_films = []
 
@@ -61,7 +63,6 @@ def search_or_recommend():
                 else: genres= [row[2]]
 
                 if not genreToAdd in genres:
-                    genres = row
                     potentail_films.remove(", ".join(row))
 
         if 2 in filters.keys():
@@ -69,9 +70,34 @@ def search_or_recommend():
             reader2 = csv.reader(file)
             for row in reader2:
                 directors = row[1].split(", ")
+                if not director in directors:
+                    if ", ".join(row) in potentail_films: potentail_films.remove(", ".join(row))
 
-#        for i in potentail_films:
-#            print(i)
+        if 3 in filters.keys():
+            file.seek(0)
+            reader3 = csv.reader(file)
+            for row in reader3:
+                actors = row[5].split(", ")
+                if not actor in actors:
+                    if ", ".join(row) in potentail_films: potentail_films.remove(", ".join(row))
+
+        if 4 in filters.keys():
+            file.seek(0)
+            reader4 = csv.reader(file)
+            for row in reader4:
+                time = row[4]
+                if type(time) == int: 
+                    validTime = time >= legnthMin and time <= lengthMax
+                    if not validTime:
+                        if ", ".join(row) in potentail_films: potentail_films.remove(", ".join(row))
+
+        for i in potentail_films:
+            print(i)
+            sleep(0.02)
+
+        if not bool(potentail_films): print("There are no movies that meet that requirement")
+
+        cont = input("Hit enter to continue")
             
 
 
