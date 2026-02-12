@@ -55,15 +55,6 @@ spawnTimer = 0
 spawnEveryXFrames = 90
 
 def endGame():
-    text_surface = font.render("3", True, BLACK)
-    screen.blit(text_surface, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100, 100))
-    sleep(1)
-    text_surface = font.render("2", True, BLACK)
-    screen.blit(text_surface, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100, 100))
-    sleep(1)
-    text_surface = font.render("1", True, BLACK)
-    screen.blit(text_surface, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100, 100))
-    sleep(1)
     return score, highScore
 
 with open("Personal Projects\scoreSaver.txt", "r") as file:
