@@ -1,9 +1,5 @@
 import pakistans_functions as pf
-
-books = []
-
-nameRef = {}
-authorRef = {}
+import csv
 
 def startMenu():
     print("1. View")
@@ -26,16 +22,13 @@ def startMenu():
 def add():
     name = input("Whats the title of the book? ").strip()
     author = input("Who is the author of the book ").strip()
+    genre = input("What is the genre of the book ").strip()
+    year = pf.idiot_proof_general("What year was it published? ")
 
-    outString = f"{name} by {author}"
-    print(outString)
-    books.append(outString)
-
-    nameRef[name] = outString
-    if author in authorRef.keys(): authorRef[author].append(outString)
-    else: 
-        authorRef[author] = []
-        authorRef[author].append(outString)
+    with open("Practices/books.csv", "w") as file:
+        outList = [name, author, genre, year]
+        writer = csv.writer(file)
+        writer.writerow(outList)
 
 def view(): 
     if bool(books):
