@@ -149,9 +149,15 @@ def runFleshCubeII():
         file.write(str(highScore))
 
     YELLOWTEXT = "\033[33m"
+    BOLD = "\033[1m"
+    CLEAR = "\033[0m"
+    UNDERLINE = "\033[4m"
 
     print(" ")
-    print(f"{YELLOWTEXT}Score: {score}")
+    print(f"{BOLD}{YELLOWTEXT}Score: {UNDERLINE}{score}{CLEAR}")
+    
+    if score == highScore: print(f"{BOLD}{YELLOWTEXT}New High Score!{CLEAR}")
+
     print(" ")
     return score, highScore
 
