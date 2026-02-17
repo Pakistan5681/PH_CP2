@@ -25,7 +25,7 @@ def add():
     genre = input("What is the genre of the book ").strip()
     year = pf.idiot_proof_general("What year was it published? ")
 
-    with open("Practices/books.csv", "w") as file:
+    with open("Practices/books.csv", "w", newline='') as file:
         outList = [name, author, genre, year]
         writer = csv.writer(file)
         writer.writerow(outList)
