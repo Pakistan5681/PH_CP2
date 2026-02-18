@@ -1,9 +1,6 @@
+
 import pakistans_functions as pf
-
-books = []
-
-nameRef = {}
-authorRef = {}
+import csv
 
 def startMenu():
     print("1. View")
@@ -26,67 +23,78 @@ def startMenu():
 def add():
     name = input("Whats the title of the book? ").strip()
     author = input("Who is the author of the book ").strip()
+    genre = input("What is the genre of the book ").strip()
+    year = pf.idiot_proof_general("What year was it published? ")
 
-    outString = f"{name} by {author}"
-    print(outString)
-    books.append(outString)
+    with open("Practices/books.csv", "a", newline='') as file:
+        outList = [name, author, genre, year]
+        writer = csv.writer(file)
+        writer.writerow(outList)
 
-    nameRef[name] = outString
-    if author in authorRef.keys(): authorRef[author].append(outString)
-    else: 
-        authorRef[author] = []
-        authorRef[author].append(outString)
-
-def view(): 
-    if bool(books):
-        print(" ")  
-        for i in books: print(i)    
-        print(" ")
-    else:
-        print("You have no books in your library")
+def view():
+    with open("Practices/books.csv", "r") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            print(f"{row[0]} by {row[1]}, a {row[2]} novel written in {row[3]}")
 
 def remove():
-    if bool(books):
-        removeFilter = pf.idiot_proof_specific("Would you like to sort by 'name' or 'author'? ", ["name", "author"])
-
+    rowsToKeep = []
+    with open("Practices/books.csv", "r") as file:
+        removeFilter = 0
+        filterInput = ""
         view()
         print(" ")
-        if removeFilter == "author":
-            authors = []
-            for i in authorRef.keys(): authors.append(i)
+        removeFilter = pf.idiot_proof_specific("Would you like to sort by 'name', 'author', 'genre', or 'year'? ", ["name", "author", "genre", "year"])
 
-            author = pf.idiot_proof_specific("What is the name of the author? ", authors, "That author has not written any books in your library")
+        match removeFilter:
+            case "name": 
+                removeFilter = 0
+                filterInput = input("What is the name of the book? ")                
+            case "author": 
+                removeFilter = 1
+                filterInput = input("What is the name of the author? ")
+            case "genre": 
+                removeFilter = 2
+                filterInput = input("What is the books genre? ")
+            case "year": 
+                removeFilter = 3
+                filterInput = input("What year was the book written? ")
+            
 
-            for i in authorRef[author]:
-                books.remove(i)
-                print(f"{i} was removed from your library")
+        reader = csv.reader(file)
+        for row in reader: 
+            if row[removeFilter] != filterInput:
+                rowsToKeep.append(row)
 
-            del authorRef[author]
-        else:
-            names = []
-            for i in nameRef.keys(): names.append(i)
-
-            name = pf.idiot_proof_specific("What is the name of the book? ", names, "That book is not in your library")
-            books.remove(nameRef[name])
-            print(f"{nameRef[name]} was removed from your library")
-
-            del nameRef[name]
-    else:
-        print("You have no books in your library")
+    with open("Practices/books.csv", mode='w', newline='') as write_file:
+        writer = csv.writer(write_file)
+        writer.writerows(rowsToKeep)
 
 def search():
-    if bool(books):
-        authors = []
-        for i in authorRef.keys(): authors.append(i)
+    with open("Practices/books.csv", "r") as file: 
+        removeFilter = pf.idiot_proof_specific("Would you like to sewarch by 'name', 'author', 'genre', or 'year'? ", ["name", "author", "genre", "year"])
+        removeFilter = 0
+        filterInput = ""
 
-        author = pf.idiot_proof_specific("What author do you want to look up? ", authors, "That author has not written any books in your library")
-        print(" ")
+        match removeFilter:
+            case "name": 
+                removeFilter = 0
+                filterInput = input("What is the name of the book? ")                
+            case "author": 
+                removeFilter = 1
+                filterInput = input("What is the name of the author? ")
+            case "genre": 
+                removeFilter = 2
+                filterInput = input("What is the books genre? ")
+            case "year": 
+                removeFilter = 3
+                filterInput = input("What year was the book written? ")
 
-        for i in authorRef[author]:
-            print(f"You have {i} in your library")
-    else:
-        print("You have no books in your library")
-
+        reader = csv.reader(file)
+        for row in reader: 
+            if row[removeFilter] == filterInput:
+                print(f"{row[0]} by {row[1]}, a {row[2]} novel written in {row[3]}")
+                
 
 while True:
     boolean = startMenu()

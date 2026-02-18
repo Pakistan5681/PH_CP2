@@ -9,11 +9,12 @@ def runFleshCubeII():
 
     RED = (255, 0, 0)
     BLACK = (0, 0, 0)
-    GREEN = (0, 255, 0)
-    BROWN = (155, 118, 83)
+    GREEN = (6, 69, 23)
+    BROWN = (82, 49, 2)
     PLAYER_COLOR = (242, 177, 97)
-    SKY_BLUE = (135, 206, 235)
+    SKY_BLUE = (2, 78, 122)
     YELLOW = (255, 255, 0)
+    WHITE = (255, 255, 255)
 
     running = True
 
@@ -26,7 +27,7 @@ def runFleshCubeII():
     ground = (SCREEN_HEIGHT / 12) * 9 # The lowest point the player can be
 
     fps = 60
-    max_fps = 500
+    max_fps = 5000
 
     score = 0
     highScore = 0
@@ -54,6 +55,18 @@ def runFleshCubeII():
     spawnEveryXFrames = 90
     spawnTimer = 0
 
+    def playAuto(hazards, PLAYER_X, touchingGround, yVel):     
+        for i in range(len(hazards)):
+            if hazards[i] - PLAYER_X < 300 and hazards[i] - PLAYER_X > 0 and touchingGround:
+                yVel = -20
+                touchingGround = False
+                print("JUMPY JUMP")
+                break
+
+        return touchingGround, yVel
+
+        
+
     with open("Personal Projects\scoreSaver.txt", "r") as file:
         highScore = int(file.read())
 
@@ -72,6 +85,8 @@ def runFleshCubeII():
                 yVel = -20
                 touchingGround = False
 
+        touchingGround, yVel = playAuto(hazards, PLAYER_X, touchingGround, yVel)
+
         if not touchingGround: yVel += gravity
         playerY += yVel
 
@@ -79,6 +94,8 @@ def runFleshCubeII():
             touchingGround = True
             playerY = ground
             yVel = 0
+
+        
 
         player_rect = py.Rect(
             PLAYER_X,
@@ -90,7 +107,7 @@ def runFleshCubeII():
         py.draw.rect(screen, BROWN, (0, ground, SCREEN_WIDTH, ground)); py.draw.rect(screen, GREEN, (0, ground, SCREEN_WIDTH, ground / 15))
         py.draw.rect(screen, PLAYER_COLOR, player_rect)
 
-        py.draw.ellipse(screen, YELLOW, (1800, 100, 100, 100))
+        py.draw.ellipse(screen, WHITE, (1800, 100, 100, 100))
 
         spawnTimer += 1
 
