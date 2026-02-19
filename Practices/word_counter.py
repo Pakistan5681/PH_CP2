@@ -25,16 +25,16 @@ def update(path):
     if findFile(path, True):
         print(" ")
         print("Document updated")
-        print(f"Word count: {getWordCount()}")
+        print(f"Word count: {getWordCount(path)}")
         with open("Docs\\word_counter_time.txt", "r") as file:
             print(f"Last updated {file.read()}")
+        print(" ")
 
         return path
     else:
         while True:
-            print(" ")
             newPath = input("What is the file path of your document? ")
-            if findFile(newPath):
+            if findFile(newPath, False):
                 break
 
         print("File path updated")
@@ -72,7 +72,7 @@ def findFile(path, updating):
             with open(path, "r") as file:
                 return True
 
-        except FileNotFoundError:
+        except FileNotFoundError:           
             print(" ")
             print(f"The file '{path}' does not exist")
             print(" ")
