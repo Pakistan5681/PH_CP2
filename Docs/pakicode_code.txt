@@ -1,3 +1,5 @@
 var beans 55;
+var jeff 918;
+var glock "hello world";
 
-print(beans);
+print(glock);

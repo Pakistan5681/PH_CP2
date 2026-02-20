@@ -1,6 +1,7 @@
 variables = {}
 
 TEXT_RED = "\x1b[31m"
+TEXT_RESET = "\x1b[0m"
 
 def seperate(file_contents):
     return file_contents.split(";")
@@ -9,27 +10,39 @@ def print_all_lines(lines):
     for i in lines: print(i)
 
 def run():
-    with open("Docs\\pakicode_code.txt", "r") as file:
+    with open("Docs/pakicode_code.txt", "r") as file:
         lines = seperate(file.read())
-        for i in lines: process_line(i)
+        for i in lines: process_line(i, lines.index(i))
 
-def process_line(line):
+def process_line(line, index):
     words = line.split(" ")
+    functions = []
 
     for i in words:
+        i = i.strip()
         if i != "" and i != " ":
-            if i != "var":
-                i = i.strip()
+            if i != "var":           
 
-                if "(" in i:
+                if "(" in i: # Removes the parantheses for variable assignment
                     i = i.replace("(", " ")
                     i = i.replace(")", "")
 
-                func = i.split(" ")
+                if '"' in i: # string stuff
+                    for j in range(len(words) - words.index(i)) + words.index(i):
+                        word = words[j]
+                        if '"' in word:
 
-                get_function(func)
+
+                func = i.split(" ")
+                if len(func) > 1 and check_if_var(func[1], index + 1):
+                    func[1] =  variables[func[1]]
+
+                functions.append(func)
             else: 
                 create_var(words)
+
+    for i in functions:
+        get_function(i)
 
 def get_function(key):
     match key[0]:
@@ -37,24 +50,32 @@ def get_function(key):
 
 def pc_print(input):
     input = input.replace('"', "")
-    input = input.replace("'", "")
     print(input)
 
 def create_var(line):
     variables[line[1]] = line[2]
-    print(f"{line[1]} = {line[2]}")
-    print(variables[line[1]])
 
-def check_if_var(input):
+def check_if_var(input, lineIndex):
     global variables
-    global TEXT_RED
+    
     if not isinstance(input, int) and not isinstance(input, float) and not isinstance(input, bool):
         if '"' in input:
+            print("This is a string")
             return False
         else:
             if input in variables.keys():
+                print("This is a variable")
                 return True
             else:
-                print(f{TEXT_RED})
+                throw_error(f"The variable '{input}' does not exist. Are you perhaps missing quotation marks?", lineIndex)
+        
+def throw_error(errorString, lineIndex):
+    global TEXT_RED
+    global TEXT_RESET
+    print(f"{TEXT_RED}{errorString}")
+    print(f"Error on line {lineIndex}{TEXT_RESET}")
+
+def doMath(equation):
+    pass
 
 run()
