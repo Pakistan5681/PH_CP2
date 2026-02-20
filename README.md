@@ -1,5 +1,5 @@
 # Repository II: The Awakening  
- 
+
 This is my second school repository. It contains some of the best code known to man, and simply showing somebody this will instantly land me a job at any programming-based company. 
  
 ## Notable Scripts
@@ -11,9 +11,10 @@ This is my second school repository. It contains some of the best code known to 
 
 ## Future Projects
 ***
-- A simple infinite runner game using the 3D renderer
-- An update to Flesh Cube II that adds sprites and powerups
-- Get to Canada imported into this repository
+1. My own programming language for pygame
+2. A simple infinite runner game using the 3D renderer
+3. An update to Flesh Cube II that adds sprites and powerups
+4. Get to Canada imported into this repository
 
 ## Contributors
 ***

@@ -1,0 +1,3 @@
+var beans 55;
+
+print(beans);
