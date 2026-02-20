@@ -9,11 +9,13 @@ def seperate(file_contents):
 def print_all_lines(lines):
     for i in lines: print(i)
 
+# runs the code from the 'pakicode_code' file
 def run():
     with open("Docs/pakicode_code.txt", "r") as file:
         lines = seperate(file.read())
         for i in lines: process_line(i, lines.index(i))
 
+# a function used to process a line into code
 def process_line(line, index):
     words = line.split(" ")
     functions = []
@@ -27,12 +29,13 @@ def process_line(line, index):
                     i = i.replace("(", " ")
                     i = i.replace(")", "")
 
-                if '"' in i: # string stuff
+                if '"' in i: # combines all words in a string to one variable
                     for j in range(len(words) - words.index(i)) + words.index(i):
                         word = words[j]
                         if '"' in word:
+                            pass # logic for string combination goes here
 
-
+                # turns the word into a function-ready format
                 func = i.split(" ")
                 if len(func) > 1 and check_if_var(func[1], index + 1):
                     func[1] =  variables[func[1]]
@@ -44,17 +47,24 @@ def process_line(line, index):
     for i in functions:
         get_function(i)
 
+# converts key into a runnable function
 def get_function(key):
     match key[0]:
         case "print": pc_print(key[1])
+        case "pystart"
 
+# a simple print method
 def pc_print(input):
     input = input.replace('"', "")
     print(input)
 
+def pygameStart():
+    pass
+
 def create_var(line):
     variables[line[1]] = line[2]
 
+# checks if some input is a variable, returns true if so and false if not
 def check_if_var(input, lineIndex):
     global variables
     
@@ -68,14 +78,11 @@ def check_if_var(input, lineIndex):
                 return True
             else:
                 throw_error(f"The variable '{input}' does not exist. Are you perhaps missing quotation marks?", lineIndex)
-        
+
 def throw_error(errorString, lineIndex):
     global TEXT_RED
     global TEXT_RESET
     print(f"{TEXT_RED}{errorString}")
     print(f"Error on line {lineIndex}{TEXT_RESET}")
-
-def doMath(equation):
-    pass
 
 run()
