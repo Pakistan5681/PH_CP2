@@ -26,8 +26,8 @@ def runFleshCubeII():
 
     ground = (SCREEN_HEIGHT / 12) * 9 # The lowest point the player can be
 
-    fps = 500
-    max_fps = 5000
+    fps = 45
+    max_fps = 500
 
     score = 0
     highScore = 0
@@ -84,8 +84,6 @@ def runFleshCubeII():
                 yVel = -20
                 touchingGround = False
 
-        touchingGround, yVel = playAuto(hazards, PLAYER_X, touchingGround, yVel)
-
         if not touchingGround: yVel += gravity
         playerY += yVel
 
@@ -113,7 +111,7 @@ def runFleshCubeII():
         if spawnTimer == spawnEveryXFrames:
             hazards.append(SCREEN_WIDTH + SPIKE_WIDTH)
             spawnTimer = 0
-            spawnEveryXFrames = randint(90, 91)
+            spawnEveryXFrames = randint(90, 150)
 
             spike_colliders.append(py.Rect(
                 SCREEN_WIDTH,

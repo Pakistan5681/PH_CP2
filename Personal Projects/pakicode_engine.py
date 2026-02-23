@@ -33,12 +33,13 @@ def process_line(line, index):
                     for j in range(len(words) - words.index(i)) + words.index(i):
                         word = words[j]
                         if '"' in word:
-                            pass # logic for string combination goes here
+                            index = line.index(i) # the string is from words[i] to words[j]
+
 
                 # turns the word into a function-ready format
                 func = i.split(" ")
                 if len(func) > 1 and check_if_var(func[1], index + 1):
-                    func[1] =  variables[func[1]]
+                    func[1] = variables[func[1]]
 
                 functions.append(func)
             else: 
@@ -51,7 +52,7 @@ def process_line(line, index):
 def get_function(key):
     match key[0]:
         case "print": pc_print(key[1])
-        case "pystart"
+        case "pystart": pass
 
 # a simple print method
 def pc_print(input):
