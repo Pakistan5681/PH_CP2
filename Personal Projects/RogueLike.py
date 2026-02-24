@@ -22,19 +22,21 @@ py.display.set_caption("Flesh Cube II")
 
 playerX = SCREEN_WIDTH / 2
 playerY = SCREEN_HEIGHT / 2
-playerSpeed = 1
+playerSpeed = 4
 
 reloading = False
 reloadClock = 0
-reloadTime = 30
+reloadTime = 15
 
 bullets = []
-bulletSpeed = 3
+bulletColliders = []
+bulletSpeed = 10
 
 regfoes = []
+regColliders = []
 regSpawnClock = 0
 regSpawnTime = 60
-regFoeSpeed = 5
+regFoeSpeed = 2
 
 def get_foe_pos():
     global SCREEN_WIDTH
@@ -94,10 +96,17 @@ while running:
             reloading = False
 
     fullnew = []
+    bulletColliders = []
     for i in bullets:
         new = [i[0] + i[2], i[1] + i[3], i[2], i[3]]
         py.draw.ellipse(screen, BLACK, (new[0], new[1], 20, 20))   
         fullnew.append(new)
+        bulletColliders.append(py.Rect(
+                    new[0],
+                    new[1],
+                    50,
+                    50
+                ))
 
     bullets = fullnew
 
@@ -107,6 +116,7 @@ while running:
         regSpawnClock = 0
 
     fullnew = []
+    regColliders = []
     for i in regfoes:
         new = i
         if playerX < i[0]:
@@ -122,8 +132,21 @@ while running:
 
         py.draw.ellipse(screen, BLACK, (new[0], new[1], 50, 50))  
 
-    regfoes = fullnew
+        regfoes = fullnew
+        regColliders.append(py.Rect(
+                    new[0],
+                    new[1],
+                    50,
+                    50
+                ))
 
+    for i in bulletColliders:
+        for j in regColliders:
+            if j.colliderect(i):
+                enemy = j
+                proj = i
+                regfoes.remove([enemy[0], enemy[1]])
+                bullets.remove([proj[0], proj[1]])
 
     py.draw.ellipse(screen, WHITE, (playerX, playerY, 100, 100))
     if running: py.display.flip()
