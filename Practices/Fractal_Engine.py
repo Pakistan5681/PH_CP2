@@ -6,7 +6,7 @@ from random import choice
 
 # !!! The image saves to the 'Docs' file !!!
 
-colors = ["red", "green", "yellow", "black", "white", "purple", "blue", "turquoise", "gold", "brown", "r", "orange"]
+colors = ["red", "green", "yellow", "black", "white", "purple", "blue", "turquoise", "gold", "brown", "r", "orange", "khaki", "orchid", "salmon", "LimeGreen", "OliveDrab"]
 
 print(" ")
 print("Welcome to Pakistans Delightful Fractal Generator!")
@@ -55,7 +55,7 @@ t.update()
 if saveImage:
     canvas = screen.getcanvas(); x = canvas.winfo_rootx(); y = canvas.winfo_rooty(); width = canvas.winfo_width(); height = canvas.winfo_height() # Sets the parameters for capturing the turtle canvas
     sleep(0.5)
-    ImageGrab.grab(bbox=(x, y, x + width, y + height)).save("Docs/turtle_drawing.png")
+    ImageGrab.grab(bbox=(x, y, x + width, y + height)).save("Docs/fractal_image.png")
     print("Image Saved to Docs!")
 
 t.mainloop()
