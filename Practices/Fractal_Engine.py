@@ -6,7 +6,7 @@ from random import choice
 
 # !!! The image saves to the 'Docs' file !!!
 
-colors = ["red", "green", "yellow", "black", "white", "purple", "blue", "turquoise", "gold", "brown", "r", "orange", "khaki", "orchid", "salmon", "LimeGreen", "OliveDrab"]
+colors = ["red", "green", "yellow", "black", "white", "purple", "blue", "turquoise", "gold", "brown", "r", "orange", "khaki", "orchid", "salmon", "LimeGreen", "OliveDrab", "burlywood3", "bisque", "coral", "DarkGoldenrod", "chartreuse", "lemonchiffon", "honeydew4", "gainsboro"]
 
 print(" ")
 print("Welcome to Pakistans Delightful Fractal Generator!")
@@ -21,7 +21,7 @@ background = pf.idiot_proof_specific("What color would you like to use for the b
 recursion = pf.idiot_proof_num_range("How many levels do you want on the fractal? Max 8 Min 1: ", 1, 8) 
 saveImage = pf.idiot_proof_yes_no("Would you like to save the image? ")
 
-colors = ["red", "green", "yellow", "black", "white", "purple", "blue", "turquoise", "gold", "brown", "orange"]
+colors = ["red", "green", "yellow", "black", "white", "purple", "blue", "turquoise", "gold", "brown", "orange", "khaki", "orchid", "salmon", "LimeGreen", "OliveDrab", "burlywood3", "bisque", "coral", "DarkGoldenrod", "chartreuse", "lemonchiffon", "honeydew4", "gainsboro"]
 if color == 'r': color = choice(colors)
 if outline == 'r': outline = choice(colors)
 if background == 'r': background = choice(colors)
@@ -48,7 +48,6 @@ def drawTri(level):
             t.left(120)
         t.end_fill()
 
-        
 drawTri(1)
 t.update()
 
