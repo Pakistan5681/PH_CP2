@@ -1,3 +1,17 @@
+BOLD = "\033[1m"
+CLEAR = "\033[0m"
+UNDERLINE = "\033[4m"
+RESET = "\x1b[0m"
+BLACKTEXT = "\x1b[30m"	
+REDTEXT = "\x1b[31m"
+GREENTEXT = "\x1b[32m"	
+BLUETEXT = "\x1b[34m"
+PURPLETEXT = "\x1b[35m"	
+CYANTEXT = "\x1b[36m"
+WHITETEXT = "\x1b[37m"
+YELLOWTEXT = "\033[33m"
+
+
 def idiot_proof_general(input_statement, output_type = "integer", incorrect_input_message = "That input is invalid"):
         """
         Takes user input until it is the desired output type

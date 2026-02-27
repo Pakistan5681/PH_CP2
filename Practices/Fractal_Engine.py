@@ -6,12 +6,12 @@ from random import choice
 
 # !!! The image saves to the 'Docs' file !!!
 
-colors = ["red", "green", "yellow", "black", "white", "purple", "blue", "turquoise", "gold", "brown", "r", "orange", "khaki", "orchid", "salmon", "LimeGreen", "OliveDrab", "burlywood3", "bisque", "coral", "DarkGoldenrod", "chartreuse", "lemonchiffon", "honeydew4", "gainsboro"]
+colors = ["red", "green", "yellow", "black", "white", "purple", "blue", "turquoise", "gold", "brown", "r", "orange", "khaki", "orchid", "salmon", "LimeGreen", "OliveDrab", "burlywood3", "bisque", "coral", "DarkGoldenrod", "chartreuse", "lemonchiffon", "honeydew4", "gainsboro"] # I just added all the weirdest color names from the turtle library on top of the standard colors
 
 print(" ")
 print("Welcome to Pakistans Delightful Fractal Generator!")
 print("This code generates a Serpinski Trangle. ")
-print("When choosing a color, enter a common color name or type 'r' to randomize the color")
+print(f"When choosing a color, enter a common color name or type '{pf.BOLD}{pf.UNDERLINE}r{pf.RESET}' to randomize the color")
 input("Hit enter to continue ")
 print(" ")
 
@@ -32,7 +32,7 @@ screen = t.Screen()
 
 root = screen._root; root.attributes('-topmost', True); root.attributes('-topmost', False) # Automatically opens the turtle screen
 
-recursion += 1
+recursion += 1 # Dont worry about this 
 
 def drawTri(level):
     if level == recursion:
@@ -53,8 +53,8 @@ t.update()
 
 if saveImage:
     canvas = screen.getcanvas(); x = canvas.winfo_rootx(); y = canvas.winfo_rooty(); width = canvas.winfo_width(); height = canvas.winfo_height() # Sets the parameters for capturing the turtle canvas
-    sleep(0.5)
-    ImageGrab.grab(bbox=(x, y, x + width, y + height)).save("Docs/fractal_image.png")
+    sleep(0.5) # A small delay to allow the window to fully open
+    ImageGrab.grab(bbox=(x, y, x + width, y + height)).save("Docs/fractal_image.png") # Essentially takes a screenshot in the bounds of the turtle window
     print("Image Saved to Docs!")
 
 t.mainloop()
