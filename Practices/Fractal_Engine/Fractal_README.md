@@ -6,9 +6,9 @@ This code will generate a fractal using user input. it can have between 1 and 8 
  
 ## How to use the project 
 *** 
-1. Numbered list 
-2. Describes the steps to use the project 
-3. INCLUDING any external libraries that need to be installed 
+1. Install PIL
+2. Hit play
+3. If you saved the image, it will appear in a 'docs' folder or the repository folder
 
 ## List of Key Features
 ***
