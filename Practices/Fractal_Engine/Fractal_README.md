@@ -1,6 +1,6 @@
 # Fractal Engine  
 
-![A fractal created with the program](Practices\Fractal_Engine\Fractal_README.md)
+![A fractal created with the program](README_image.png)
  
 This code will generate a fractal using user input. it can have between 1 and 8 recursion layers. You can save the image. It will try to save to a 'docs' folder, but if it doesn't find one it will save in the repository outside of folders
  
