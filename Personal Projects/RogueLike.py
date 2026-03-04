@@ -2,7 +2,7 @@ import pygame as py
 from random import choice, randint
 
 class Upgrade:
-    def __init__(self, name, stat, amount):
+    def __init__(self, name, stat, amount, rarity):
         self.name = name
         self.stat = stat
         self.amount = amount
@@ -10,7 +10,19 @@ class Upgrade:
 py.init()
 
 potUpgrades = [
-    Upgrade()
+    Upgrade("Vitality", "maxHealth", 1, "common"),
+    Upgrade("Big Vitality", "maxHealth", 2, "rare"),
+    Upgrade("Huge Vitality", "maxHealth", 3, "epic"),
+    Upgrade("Pakistinian Vitality", "maxHealth", 5, "pakistinian"),
+    Upgrade("Haste", "playerSpeed", 1, "common"),
+    Upgrade("Quick", "playerSpeed", 2, "rare"),
+    Upgrade("Lightning Fast", "playerSpeed", 3, "epic"),
+    Upgrade("Speed of Pakistan", "playerSpeed", 5, "pakistinian"),
+    Upgrade("Quick Hands", "reloadTime", 0.9, "common"),
+    Upgrade("Dexterous", "reloadTime", 0.8, "rare"),
+    Upgrade("Reloader", "reloadTime", 0.7, "epic"),
+    Upgrade("Pakistinian Dexterity", 0.55, "pakistinian"),
+    Upgrade("Full Heal", "health", 0, "rare")
 ]
 
 SCREEN_WIDTH = 1920
@@ -30,7 +42,7 @@ running = True
 screen = py.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 clock = py.time.Clock()
-py.display.set_caption("Flesh Cube II")
+py.display.set_caption("Pakistans Boisterous Rougelike")
 
 playerX = SCREEN_WIDTH / 2
 playerY = SCREEN_HEIGHT / 2
