@@ -13,6 +13,8 @@ PLAYER_COLOR = (242, 177, 97)
 SKY_BLUE = (2, 78, 122)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
+GREY = (79, 79, 79)
+XP_GREEN = (0, 255, 38)
 
 running = True
 screen = py.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -38,7 +40,16 @@ regSpawnClock = 0
 regSpawnTime = 60
 regFoeSpeed = 2
 
-def get_foe_pos():
+maxHealth = 3
+health = 3
+
+xp = 0
+upgradeReq = 10
+
+xp_bar_lengnth = 500
+xp_bar_start = 25
+
+def get_foe_pos(): # For spawning foes, spawns a foe outside of the screen
     global SCREEN_WIDTH
     global SCREEN_HEIGHT
  
@@ -71,6 +82,7 @@ while running:
     keys = py.key.get_pressed()
     screen.fill(SKY_BLUE)
 
+    # Player movement
     if keys[py.K_a]:
         playerX -= playerSpeed
     if keys[py.K_d]:
@@ -80,25 +92,28 @@ while running:
     if keys[py.K_s]:
         playerY += playerSpeed
 
+    #Bullet firing
     player_pos = py.math.Vector2(playerX, playerY)
     mouse_pos = py.math.Vector2(py.mouse.get_pos())
     direction = mouse_pos - player_pos
-    direction = direction.normalize() * bulletSpeed
+    direction = direction.normalize() * bulletSpeed   
     
     if keys[py.K_SPACE] and not reloading:
         bullets.append([playerX + 50, playerY + 50, direction.x, direction.y])
         reloading = True
         reloadClock = 0
 
+    # Fire cooldown
     if reloading:
         reloadClock += 1
         if reloadClock >= reloadTime:
             reloading = False
 
+    # Bullet movement
     fullnew = []
     bulletColliders = []
     for i in bullets:
-        new = [i[0] + i[2], i[1] + i[3], i[2], i[3]]
+        new = [round(i[0] + i[2]), round(i[1] + i[3]), i[2], i[3]]
         py.draw.ellipse(screen, BLACK, (new[0], new[1], 20, 20))   
         fullnew.append(new)
         bulletColliders.append(py.Rect(
@@ -110,6 +125,7 @@ while running:
 
     bullets = fullnew
 
+    # Enemy spawning
     regSpawnClock += 1
     if regSpawnClock >= regSpawnTime:
         regfoes.append(get_foe_pos())
@@ -117,6 +133,8 @@ while running:
 
     fullnew = []
     regColliders = []
+
+    # Enemy movement
     for i in regfoes:
         new = i
         if playerX < i[0]:
@@ -140,13 +158,53 @@ while running:
                     50
                 ))
 
+    # Checks for bullet-enemy collisions
     for i in bulletColliders:
         for j in regColliders:
             if j.colliderect(i):
                 enemy = j
                 proj = i
-                regfoes.remove([enemy[0], enemy[1]])
-                bullets.remove([proj[0], proj[1]])
+                regfoes.remove([enemy.x, enemy.y])
+
+                for k in bullets:
+                    if k[0] == proj.x and k[1] == proj.y:
+                        bullets.remove(k)
+
+                xp += 1
+    # Draws the healthbar
+    for i in range(maxHealth):
+        if i + 1 > health:
+            py.draw.ellipse(screen, GREY, (25 + (i * 37), 25, 25, 25))
+        else:
+            py.draw.ellipse(screen, RED, (25 + (i * 37), 25, 25, 25))
+
+    playerCollider = py.Rect(playerX, playerY, 100, 100)
+
+    # Checks for player-enemy collisions
+    for i in regColliders:
+        if i.colliderect(playerCollider):
+            health -= 1
+            regfoes.remove([i[0], i[1]])
+
+    # Draws the XP bar
+    for i in range(upgradeReq):
+        if i + 1 > xp:
+            py.draw.rect(screen, GREY, (xp_bar_start + (i * (xp_bar_lengnth / upgradeReq)), 75, (xp_bar_lengnth / upgradeReq), 25))
+        else:
+            py.draw.rect(screen, XP_GREEN, (xp_bar_start + (i * (xp_bar_lengnth / upgradeReq)), 75, (xp_bar_lengnth / upgradeReq), 25))
+
+    if xp >= upgradeReq:
+        xp = 0
+        upgradeReq = round(upgradeReq * 1.25)
+        # Logic for level up goes here
+
+    # kills the player
+    if health <= 0:
+        running = False
 
     py.draw.ellipse(screen, WHITE, (playerX, playerY, 100, 100))
     if running: py.display.flip()
+
+def LevelUpOptions():
+    while True:
+        
