@@ -1,7 +1,17 @@
 import pygame as py
 from random import choice, randint
 
+class Upgrade:
+    def __init__(self, name, stat, amount):
+        self.name = name
+        self.stat = stat
+        self.amount = amount
+
 py.init()
+
+potUpgrades = [
+    Upgrade()
+]
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
@@ -207,4 +217,5 @@ while running:
 
 def LevelUpOptions():
     while True:
-        
+        for i in range(3):
+            py.draw.rect(screen, GREY, (i * ((SCREEN_WIDTH / 3) + 50), SCREEN_HEIGHT - 200, ))
