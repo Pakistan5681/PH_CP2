@@ -9,6 +9,15 @@ class Upgrade:
         self.rarity = rarity
         self.description = description
 
+class Enemy:
+    def __init__(self, x, y, collider, velX, velY, speed):
+        self.x = x
+        self.y = y
+        self.collider = collider
+        self.velX = velX
+        self.velY = velY
+        self.speed = speed
+
 py.init()
 
 potUpgradesRaw = [
@@ -94,6 +103,7 @@ regColliders = []
 regSpawnClock = 0
 regSpawnTime = 20
 regFoeSpeed = 2
+acceleration = 0.2
 
 # Health
 maxHealth = 3
@@ -137,7 +147,7 @@ def get_foe_pos(): # For spawning enemies; spawns an enemy outside of the screen
 
     return out
 
-def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, knowledge, bulletSpeed): # Runs all logic for upgrading the player
+def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge): # Runs all logic for upgrading the player
     global potUpgrades
 
     def applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, stat, amount): # Actually applies the upgrades
@@ -258,7 +268,8 @@ while running:
     # Enemy spawning
     regSpawnClock += 1
     if regSpawnClock >= regSpawnTime:
-        regfoes.append(get_foe_pos())
+        pos = get_foe_pos()
+        regfoes.append(Enemy(pos[0], pos[1], py.Rect(pos[0], pos[1], 50, 50), 0, 0, 2))
         regSpawnClock = 0 
  
     fullnew = [] 
@@ -267,31 +278,33 @@ while running:
     # Enemy movement 
     for i in regfoes: 
         new = i 
-        if playerX < i[0]: 
-            new[0] -= regFoeSpeed 
-        elif playerX > i[0]: 
-            new[0] += regFoeSpeed 
-        if playerY < i[1]: 
-            new[1] -= regFoeSpeed 
-        elif playerY > i[1]: 
-            new[1] += regFoeSpeed 
+        if playerX < i.x: 
+            new.velX -= acceleration 
+        elif playerX > i.x: 
+            new.velX += acceleration 
+        if playerY < i.y: 
+            new.velY -= acceleration 
+        elif playerY > i.y: 
+            new.velY += acceleration 
+
+        if new.velX > regFoeSpeed: new.velX = regFoeSpeed 
+        if new.velX < -regFoeSpeed: new.velX = -regFoeSpeed
+        if new.velY > regFoeSpeed: new.velY = regFoeSpeed 
+        if new.velY < -regFoeSpeed: new.velY = -regFoeSpeed
+
+        new.x += new.velX
+        new.y += new.velY
  
         fullnew.append(new) 
  
-        py.draw.ellipse(screen, BLACK, (new[0], new[1], 50, 50))  
+        py.draw.ellipse(screen, BLACK, (new.x, new.y, 50, 50))  
 
         regfoes = fullnew
-        regColliders.append(py.Rect(
-                    new[0],
-                    new[1],
-                    50,
-                    50
-                ))
 
     # Checks for bullet-enemy collisions
     for i in bulletColliders:
-        for j in regColliders:
-            if j.colliderect(i):
+        for j in regfoes:
+            if j.collider.colliderect(i):
                 enemy = j
                 proj = i
                 if [enemy.x, enemy.y] in regfoes: regfoes.remove([enemy.x, enemy.y])
@@ -311,8 +324,8 @@ while running:
     playerCollider = py.Rect(playerX, playerY, 100, 100)
 
     # Checks for player-enemy collisions
-    for i in regColliders:
-        if i.colliderect(playerCollider):
+    for i in regfoes:
+        if i.collider.colliderect(playerCollider):
             health -= 1
             if [enemy.x, enemy.y] in regfoes: regfoes.remove([i[0], i[1]])
 
@@ -322,6 +335,9 @@ while running:
             py.draw.rect(screen, GREY, (xp_bar_start + (i * (xp_bar_lengnth / upgradeReq)), 75, (xp_bar_lengnth / upgradeReq), 25))
         else:
             py.draw.rect(screen, XP_GREEN, (xp_bar_start + (i * (xp_bar_lengnth / upgradeReq)), 75, (xp_bar_lengnth / upgradeReq), 25))
+
+    surface = font.render(f"{xp}/{upgradeReq}", True, WHITE)
+    screen.blit(surface, (xp_bar_start, 75, xp_bar_lengnth, 25))
 
     # Upgrade Logic
     if xp >= upgradeReq:
