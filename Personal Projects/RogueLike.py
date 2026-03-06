@@ -37,13 +37,13 @@ potUpgrades = []
 for i in potUpgradesRaw:
     match i.rarity:
         case "common":
-            for i in range(10): potUpgrades.append(i)
+            for j in range(10): potUpgrades.append(i)
         case "rare":
-            for i in range(5): potUpgrades.append(i)
+            for j in range(5): potUpgrades.append(i)
         case "epic":
-            for i in range(3): potUpgrades.append(i)
+            for j in range(3): potUpgrades.append(i)
         case "pakistinian":
-            for i in range(1): potUpgrades.append(i)
+            for j in range(1): potUpgrades.append(i)
 
 # Screen Parameters
 SCREEN_WIDTH = 1920
@@ -320,7 +320,7 @@ while running:
     if xp >= upgradeReq:
         xp = 0
         upgradeReq = round(upgradeReq * 1.25)
-        playerSpeed, health, maxHealth, reloadTime, bulletSpeed = LevelUpOptions(playerSpeed, health, maxHealth, reloadTime)
+        playerSpeed, health, maxHealth, reloadTime, bulletSpeed = LevelUpOptions(playerSpeed, health, maxHealth, reloadTime, bulletSpeed)
 
     # kills the player
     if health <= 0:
