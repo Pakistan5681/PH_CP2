@@ -103,7 +103,7 @@ regColliders = []
 regSpawnClock = 0
 regSpawnTime = 20
 regFoeSpeed = 2
-acceleration = 0.2
+acceleration = 0.067
 
 # Health
 maxHealth = 3
@@ -176,7 +176,7 @@ def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpe
         rect = py.Rect(i * (SCREEN_WIDTH / 3) + 12, 100, (SCREEN_WIDTH / 3) - 25, SCREEN_HEIGHT - 200)
         rects.append(rect)
 
-    while True:
+    while running:
         # Title Text 
         screen.fill(WHITE)
         texty = bigFont.render("Choose An Upgrade!", True, BLACK)
@@ -202,6 +202,8 @@ def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpe
                     return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, upgrades[1].stat, upgrades[1].amount)
                 elif rects[2].collidepoint(event.pos):
                     return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, upgrades[2].stat, upgrades[2].amount)
+            elif event.type == py.QUIT:
+                running = False 
 
         py.display.flip()
             
@@ -307,7 +309,8 @@ while running:
             if j.collider.colliderect(i):
                 enemy = j
                 proj = i
-                if [enemy.x, enemy.y] in regfoes: regfoes.remove([enemy.x, enemy.y])
+
+                regfoes.remove(j)
 
                 for k in bullets:
                     if k[0] == proj.x and k[1] == proj.y:
@@ -327,7 +330,7 @@ while running:
     for i in regfoes:
         if i.collider.colliderect(playerCollider):
             health -= 1
-            if [enemy.x, enemy.y] in regfoes: regfoes.remove([i[0], i[1]])
+            regfoes.remove(i)
 
     # Draws the XP bar
     for i in range(upgradeReq):
