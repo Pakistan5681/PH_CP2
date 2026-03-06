@@ -28,7 +28,11 @@ potUpgradesRaw = [
     Upgrade("Better Gunpowder", "Bullet Speed", 2, "common", "Increases Bullet Speed"),
     Upgrade("Boom Juice", "Bullet Speed", 4, "rare", "Greatly Increases Bullet Speed"),
     Upgrade("Max Propulsion", "Bullet Speed", 6, "epic", "Massively Increases Bullet Speed"),
-    Upgrade("Speed of Light", "Bullet Speed", 10, "pakistinian", "Bullets go the speed of light")
+    Upgrade("Speed of Light", "Bullet Speed", 10, "pakistinian", "Bullets go the speed of light"),
+    Upgrade("Smarts", "Knowledge", 1, "common", "Increases XP per kill by 1"),
+    Upgrade("Intelligent", "Knowledge", 2, "rare", "Increases XP per kill by 2"),
+    Upgrade("Genius", "Knowledge", 3, "epic", "Increases XP per kill by 3"),
+    Upgrade("Infinite Wisdom", "Knowledge", 5, "pakistinian", "Increases XP per kill by 5"),
 ]
 
 potUpgrades = []
@@ -88,7 +92,7 @@ bulletSpeed = 10
 regfoes = []
 regColliders = []
 regSpawnClock = 0
-regSpawnTime = 60
+regSpawnTime = 20
 regFoeSpeed = 2
 
 # Health
@@ -98,6 +102,7 @@ health = 3
 # XP
 xp = 0
 upgradeReq = 10
+knowledge = 1 
 xp_bar_lengnth = 500
 xp_bar_start = 25
 
@@ -132,24 +137,26 @@ def get_foe_pos(): # For spawning enemies; spawns an enemy outside of the screen
 
     return out
 
-def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed): # Runs all logic for upgrading the player
+def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, knowledge, bulletSpeed): # Runs all logic for upgrading the player
     global potUpgrades
 
-    def applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, stat, amount): # Actually applies the upgrades
+    def applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, stat, amount): # Actually applies the upgrades
         match stat:
             case "Max Health":
                 maxHealth += amount
-                playerHealth = maxHealth
+                playerHealth += amount
             case "Player Speed":
                 playerSpeed += amount
             case "Reload Time":
                 bulletReload *= amount
             case "Full Heal":
-                health = maxHealth
+                playerHealth = maxHealth
             case "Bullet Speed":
                 bulletSpeed += amount
+            case "Knowledge":
+                knowledge += amount
 
-        return playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed
+        return playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge
 
     # Setup
     upgrades = []
@@ -180,11 +187,11 @@ def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpe
         for event in py.event.get():
             if event.type == py.MOUSEBUTTONDOWN:
                 if rects[0].collidepoint(event.pos):
-                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, upgrades[0].stat, upgrades[0].amount)
+                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, upgrades[0].stat, upgrades[0].amount)
                 elif rects[1].collidepoint(event.pos):
-                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, upgrades[1].stat, upgrades[1].amount)
+                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, upgrades[1].stat, upgrades[1].amount)
                 elif rects[2].collidepoint(event.pos):
-                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, upgrades[2].stat, upgrades[2].amount)
+                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, upgrades[2].stat, upgrades[2].amount)
 
         py.display.flip()
             
@@ -252,25 +259,25 @@ while running:
     regSpawnClock += 1
     if regSpawnClock >= regSpawnTime:
         regfoes.append(get_foe_pos())
-        regSpawnClock = 0
-
-    fullnew = []
-    regColliders = []
-
-    # Enemy movement
-    for i in regfoes:
-        new = i
-        if playerX < i[0]:
-            new[0] -= regFoeSpeed
-        elif playerX > i[0]:
-            new[0] += regFoeSpeed
-        if playerY < i[1]:
-            new[1] -= regFoeSpeed
-        elif playerY > i[1]:
-            new[1] += regFoeSpeed
-        
-        fullnew.append(new)
-
+        regSpawnClock = 0 
+ 
+    fullnew = [] 
+    regColliders = [] 
+ 
+    # Enemy movement 
+    for i in regfoes: 
+        new = i 
+        if playerX < i[0]: 
+            new[0] -= regFoeSpeed 
+        elif playerX > i[0]: 
+            new[0] += regFoeSpeed 
+        if playerY < i[1]: 
+            new[1] -= regFoeSpeed 
+        elif playerY > i[1]: 
+            new[1] += regFoeSpeed 
+ 
+        fullnew.append(new) 
+ 
         py.draw.ellipse(screen, BLACK, (new[0], new[1], 50, 50))  
 
         regfoes = fullnew
@@ -287,13 +294,13 @@ while running:
             if j.colliderect(i):
                 enemy = j
                 proj = i
-                regfoes.remove([enemy.x, enemy.y])
+                if [enemy.x, enemy.y] in regfoes: regfoes.remove([enemy.x, enemy.y])
 
                 for k in bullets:
                     if k[0] == proj.x and k[1] == proj.y:
                         bullets.remove(k)
 
-                xp += 1
+                xp += knowledge
     # Draws the healthbar
     for i in range(maxHealth):
         if i + 1 > health:
@@ -307,7 +314,7 @@ while running:
     for i in regColliders:
         if i.colliderect(playerCollider):
             health -= 1
-            regfoes.remove([i[0], i[1]])
+            if [enemy.x, enemy.y] in regfoes: regfoes.remove([i[0], i[1]])
 
     # Draws the XP bar
     for i in range(upgradeReq):
@@ -320,7 +327,7 @@ while running:
     if xp >= upgradeReq:
         xp = 0
         upgradeReq = round(upgradeReq * 1.25)
-        playerSpeed, health, maxHealth, reloadTime, bulletSpeed = LevelUpOptions(playerSpeed, health, maxHealth, reloadTime, bulletSpeed)
+        playerSpeed, health, maxHealth, reloadTime, bulletSpeed, knowledge = LevelUpOptions(playerSpeed, health, maxHealth, reloadTime, bulletSpeed, knowledge)
 
     # kills the player
     if health <= 0:
