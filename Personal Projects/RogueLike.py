@@ -149,6 +149,7 @@ def get_foe_pos(): # For spawning enemies; spawns an enemy outside of the screen
 
 def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge): # Runs all logic for upgrading the player
     global potUpgrades
+    global running
 
     def applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, stat, amount): # Actually applies the upgrades
         match stat:
@@ -276,6 +277,9 @@ while running:
  
     fullnew = [] 
     regColliders = [] 
+
+    # Enemy Spawnrate
+    
  
     # Enemy movement 
     for i in regfoes: 
@@ -296,6 +300,8 @@ while running:
 
         new.x += new.velX
         new.y += new.velY
+
+        new.collider = py.Rect(new.x, new.y, 50, 50)
  
         fullnew.append(new) 
  
