@@ -46,7 +46,7 @@ potUpgradesRaw = [
 
 potUpgrades = []
 
-# Converts the rarity of 
+# Converts the rarity of upgrades into option weights
 for i in potUpgradesRaw:
     match i.rarity:
         case "common":
@@ -101,9 +101,14 @@ bulletSpeed = 10
 regfoes = []
 regColliders = []
 regSpawnClock = 0
-regSpawnTime = 20
 regFoeSpeed = 2
 acceleration = 0.067
+
+# Spawn Rate
+regSpawnTime = 20
+regSpawnIncreaseTime = 180
+regSpawnIncreaseClock = 0
+minSpawnTime = 2
 
 # Health
 maxHealth = 3
@@ -279,7 +284,13 @@ while running:
     regColliders = [] 
 
     # Enemy Spawnrate
-    
+    if regSpawnTime > minSpawnTime:
+        regSpawnIncreaseClock += 1
+        if regSpawnIncreaseClock >= regSpawnIncreaseTime:
+            regSpawnIncreaseClock = 0
+            regSpawnTime -= 1
+
+    print(regSpawnTime)
  
     # Enemy movement 
     for i in regfoes: 
