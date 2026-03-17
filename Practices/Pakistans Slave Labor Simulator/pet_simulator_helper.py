@@ -168,9 +168,9 @@ def day():
     pass
 
 def start():
-    print_cool("Welcome to Pakistans Slave Labor Simulator")
+    print_cool("Welcome to Pakistans Slave Labor Simulator!")
     sleep(1)
-    print_cool("I mean, welcome to Pakistans Pig Farm Simulator")
+    print_cool("I mean, welcome to Pakistans Pig Farm Simulator!")
     sleep(0.5)
     print_cool("Of course")
     sleep(0.5)
