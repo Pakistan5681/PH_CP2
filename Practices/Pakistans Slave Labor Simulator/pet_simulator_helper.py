@@ -2,7 +2,7 @@ from time import sleep
 from pakistans_functions import *
 
 class Pet:
-    def __init__(self, name, skill):
+    def __init__(self, name):
         self.name = name
         self.age = 0
         self.hunger = 100
@@ -12,7 +12,7 @@ class Pet:
         self.energy = 100
         self.awake = True
         self.alive = True
-        self.skill = skill
+        self.skill = 5
 
     def get_mood(self):
         if self.happiness > 80:
@@ -119,16 +119,16 @@ class Pet:
                 self.hunger += 50
             case "super":
                 self.hunger = 100
-                self.energy += 50
+                self.energy += 15
             case "wet":
                 self.hunger += 50
                 self.thirst += 50
             case "medicinal":
                 self.hunger += 50
-                self.health += 25
+                self.health += 15
             case "tasty":
                 self.hunger += 50
-                self.happiness += 25
+                self.happiness += 15
 
         self.normalize_vars()
 
@@ -157,15 +157,26 @@ class Pet:
 
 pets = []
 
-def menu():
+def menu(pets):
     if bool(pets):
         day()
     else:
-        start()
+        pets = start()
         day()
 
+    return pets
+
 def day():
-    pass
+    for i in pets: 
+        print(i)
+        sleep(0.1)
+
+def new_pet():
+    print_cool("You got a new pig!")
+    sleep(0.5)
+    name = input_cool("What would you like to name your pig? ")
+    print_cool(f"You now have a new pig named {name}!")
+    return Pet(name)
 
 def start():
     print_cool("Welcome to Pakistans Slave Labor Simulator!")
@@ -177,13 +188,12 @@ def start():
     print_cool("...", 0.5)
     sleep(1)
     print_cool("Anyway, lets get you started")
-    sleep(0.5)
     print_cool("I'm giving you this stater pig for free, but don't expect any more charity outta me")
-    sleep(0.5)
     print_cool("You know, like, inflation, or something")
-    sleep(0.5)
     print_cool("Make sure it doesn't die, and don't overwork it")
-    sleep(0.5)
     print_cool("Good luck, I guess")
+    sleep(2)
+    return [new_pet()]
 
-menu()
+pets = menu(pets)
+pets = menu(pets)
