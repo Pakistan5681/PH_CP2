@@ -1,7 +1,8 @@
 from time import sleep
+from pakistans_functions import *
 
 class Pet:
-    def __init__(self, name):
+    def __init__(self, name, skill):
         self.name = name
         self.age = 0
         self.hunger = 100
@@ -11,6 +12,7 @@ class Pet:
         self.energy = 100
         self.awake = True
         self.alive = True
+        self.skill = skill
 
     def get_mood(self):
         if self.happiness > 80:
@@ -157,18 +159,31 @@ pets = []
 
 def menu():
     if bool(pets):
-        day
+        day()
     else:
         start()
+        day()
 
 def day():
     pass
 
 def start():
-    print("Welcome to Pakistans Slave Labor Simulator")
+    print_cool("Welcome to Pakistans Slave Labor Simulator")
     sleep(1)
-    print(" ")
-    print("I mean, welcome to Pakistans Pet Simulator")
+    print_cool("I mean, welcome to Pakistans Pig Farm Simulator")
     sleep(0.5)
-    print("Of course")
-    print()
+    print_cool("Of course")
+    sleep(0.5)
+    print_cool("...", 0.5)
+    sleep(1)
+    print_cool("Anyway, lets get you started")
+    sleep(0.5)
+    print_cool("I'm giving you this stater pig for free, but don't expect any more charity outta me")
+    sleep(0.5)
+    print_cool("You know, like, inflation, or something")
+    sleep(0.5)
+    print_cool("Make sure it doesn't die, and don't overwork it")
+    sleep(0.5)
+    print_cool("Good luck, I guess")
+
+menu()
