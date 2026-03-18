@@ -13,66 +13,6 @@ class Pet:
         self.awake = True
         self.alive = True
         self.skill = 5
-
-    def get_mood(self):
-        if self.happiness > 80:
-            return "happy"
-        elif self.happiness > 60:
-            return "mediorcre"
-        elif self.happiness > 40:
-            return "sad"
-        elif self.happiness > 20:
-            return "depressed"
-        else:
-            return "extremely depressed"
-        
-    def get_health(self):
-        if self.health > 80:
-            return "healthy"
-        elif self.health > 60:
-            return "fine"
-        elif self.health > 40:
-            return "unhealthy"
-        elif self.health > 20:
-            return "sickly"
-        else:
-            return "near death"
-        
-    def get_hunger(self):
-        if self.hunger > 80:
-            return "full"
-        elif self.hunger > 60:
-            return "satified"
-        elif self.hunger > 40:
-            return "hungry"
-        elif self.hunger > 20:
-            return "ravenous"
-        else:
-            return "starving"
-        
-    def get_thirst(self):
-        if self.thirst > 80:
-            return "fully hydrated"
-        elif self.thirst > 60:
-            return "mostly hydrated"
-        elif self.thirst > 40:
-            return "parched"
-        elif self.thirst > 20:
-            return "bone-dry"
-        else:
-            return "entirely dehydrated"
-    
-    def get_energy(self):
-        if self.thirst > 80:
-            return "energetic"
-        elif self.thirst > 60:
-            return "awake"
-        elif self.thirst > 40:
-            return "tired"
-        elif self.thirst > 20:
-            return "exahsted"
-        else:
-            return "practically asleep"
         
     def normalize_vars(self):
         if self.hunger > 100: self.hunger = 100
@@ -86,7 +26,7 @@ class Pet:
         if self.energy < 0: self.energy = 0
         if self.health < 0: self.health = 0
         
-    def day(self):
+    def day_stat_change(self):
         self.hunger -= 20
         self.thirst -= 20
         self.happiness -= 20
@@ -141,16 +81,36 @@ class Pet:
         self.energy = 100
 
     def play(self, total_fun):
-        self.happiness += total_fun
+        self.happiness += 50
         self.hunger -= 5
         self.thirst -= 5
+        self.energy -= 25
         self.normalize_vars()
 
-    def print_status():
-        def get_bar():
+    def print_status(self):
+        def get_bar(amount, name):
+            out = f"{name} " 
+            for i in range(10):
+                if amount > i * 10:
+                    out += "█"
+                else:
+                    out += "░"
 
+            out += " "
+            out += f"({amount}%)"
+
+            print_cool(out, 0.025)
+
+        print(f"name: {self.name}")
+        print(f"age: {self.age}")
+        print(f"skill: {self.skill}")
+        get_bar(self.hunger, "hunger")
+        get_bar(self.thirst, "thirst")
+        get_bar(self.energy, "energy")
+        get_bar(self.health, "health")
+        get_bar(self.happiness, "happiness")
         
-    def __str__(self):
+    def basic_print(self):
         if self.alive:
             if self.awake:
                 return f"{self.name}, Age {self.age}"
@@ -158,39 +118,48 @@ class Pet:
                 return f"{self.name} is sleeping."
         else:
             return f"{self.name} died at age {self.age}"
+        
+    def interaction_options():
+        print("1. Feed")
+        option = idiot_proof_num_range("Select the number of desired options", 1, 7)
+        match option:
+            case 1
 
 pets = []
 
 def menu(pets):
     if bool(pets):
-        day()
+        day(pets)
     else:
-        pets = start()
-        day()
+        pets = fast_start()
+        day(pets)
 
     return pets
 
 def day(pets):
     print(" ")
     for i in pets: 
-        print_cool(i)
-
+        print_cool(i.basic_print())
+        i.day_stat_change()
+        
     currentPet = 0
     while True:
         pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
-        if pets[get_pet_index(pet, pets)].isAwake and pets[get_pet_index(pet, pets)].isAlive:
+        print(" ")
+        if pets[get_pet_index(pet, pets)].awake and pets[get_pet_index(pet, pets)].alive:
             currentPet = get_pet_index(pet, pets)
             break
         else:
             print_cool("That pet is not availible")
 
-    
-
+    pets[currentPet].print_status()
 
 def get_pet_names(pets):
     out = []
     for i in pets:
         out.append(i.name)
+
+    return out
 
 def get_pet_index(name, pets):
     for i in pets:
@@ -220,6 +189,10 @@ def start():
     print_cool("Good luck, I guess")
     sleep(2)
     return [new_pet()]
+
+def fast_start():
+    return [Pet("Jorp")]
+
 
 while True:
     pets = menu(pets)
