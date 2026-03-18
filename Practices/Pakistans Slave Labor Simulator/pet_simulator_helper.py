@@ -145,11 +145,15 @@ class Pet:
         self.hunger -= 5
         self.thirst -= 5
         self.normalize_vars()
+
+    def print_status():
+        def get_bar():
+
         
     def __str__(self):
         if self.alive:
             if self.awake:
-                return f"{self.name} is {self.age} years old. Mood: {self.get_mood()}. Hunger: {self.get_hunger()}. Thirst: {self.get_thirst()}.\nHealth: {self.get_health()}. Energy: {self.get_energy()}"
+                return f"{self.name}, Age {self.age}"
             else:
                 return f"{self.name} is sleeping."
         else:
@@ -166,10 +170,32 @@ def menu(pets):
 
     return pets
 
-def day():
+def day(pets):
+    print(" ")
     for i in pets: 
-        print(i)
-        sleep(0.1)
+        print_cool(i)
+
+    currentPet = 0
+    while True:
+        pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
+        if pets[get_pet_index(pet, pets)].isAwake and pets[get_pet_index(pet, pets)].isAlive:
+            currentPet = get_pet_index(pet, pets)
+            break
+        else:
+            print_cool("That pet is not availible")
+
+    
+
+
+def get_pet_names(pets):
+    out = []
+    for i in pets:
+        out.append(i.name)
+
+def get_pet_index(name, pets):
+    for i in pets:
+        if i.name == name:
+            return pets.index(i)    
 
 def new_pet():
     print_cool("You got a new pig!")
@@ -195,5 +221,5 @@ def start():
     sleep(2)
     return [new_pet()]
 
-pets = menu(pets)
-pets = menu(pets)
+while True:
+    pets = menu(pets)
