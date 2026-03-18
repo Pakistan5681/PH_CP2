@@ -201,4 +201,23 @@ def print_cool(statement, delay=0.05):
         print(i, end="")
         sleep(delay)
     print(" ")
+
+def input_cool(statement, delay=0.05):
+    """
+    Like a normal input statement, but displays characters one at a time with a short interval.
+
+    The statement currently doesn't support lists of any type
+
+    Time between characters can be specified
+    """
+
+    if isinstance(statement, float) or isinstance(statement, int) or isinstance(statement, bool):
+        statement = str(statement)
+    elif not isinstance(statement, str):
+        raise Exception("The inputted data type is not supported.")
+
+    for i in statement:
+        print(i, end="")
+        sleep(delay)
+    return input("")
             

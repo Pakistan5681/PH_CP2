@@ -2,7 +2,7 @@ from time import sleep
 from pakistans_functions import *
 
 class Pet:
-    def __init__(self, name, skill):
+    def __init__(self, name):
         self.name = name
         self.age = 0
         self.hunger = 100
@@ -12,7 +12,7 @@ class Pet:
         self.energy = 100
         self.awake = True
         self.alive = True
-        self.skill = skill
+        self.skill = 5
 
     def get_mood(self):
         if self.happiness > 80:
@@ -119,16 +119,16 @@ class Pet:
                 self.hunger += 50
             case "super":
                 self.hunger = 100
-                self.energy += 50
+                self.energy += 15
             case "wet":
                 self.hunger += 50
                 self.thirst += 50
             case "medicinal":
                 self.hunger += 50
-                self.health += 25
+                self.health += 15
             case "tasty":
                 self.hunger += 50
-                self.happiness += 25
+                self.happiness += 15
 
         self.normalize_vars()
 
@@ -145,11 +145,15 @@ class Pet:
         self.hunger -= 5
         self.thirst -= 5
         self.normalize_vars()
+
+    def print_status():
+        def get_bar():
+
         
     def __str__(self):
         if self.alive:
             if self.awake:
-                return f"{self.name} is {self.age} years old. Mood: {self.get_mood()}. Hunger: {self.get_hunger()}. Thirst: {self.get_thirst()}.\nHealth: {self.get_health()}. Energy: {self.get_energy()}"
+                return f"{self.name}, Age {self.age}"
             else:
                 return f"{self.name} is sleeping."
         else:
@@ -157,15 +161,48 @@ class Pet:
 
 pets = []
 
-def menu():
+def menu(pets):
     if bool(pets):
         day()
     else:
-        start()
+        pets = start()
         day()
 
-def day():
-    pass
+    return pets
+
+def day(pets):
+    print(" ")
+    for i in pets: 
+        print_cool(i)
+
+    currentPet = 0
+    while True:
+        pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
+        if pets[get_pet_index(pet, pets)].isAwake and pets[get_pet_index(pet, pets)].isAlive:
+            currentPet = get_pet_index(pet, pets)
+            break
+        else:
+            print_cool("That pet is not availible")
+
+    
+
+
+def get_pet_names(pets):
+    out = []
+    for i in pets:
+        out.append(i.name)
+
+def get_pet_index(name, pets):
+    for i in pets:
+        if i.name == name:
+            return pets.index(i)    
+
+def new_pet():
+    print_cool("You got a new pig!")
+    sleep(0.5)
+    name = input_cool("What would you like to name your pig? ")
+    print_cool(f"You now have a new pig named {name}!")
+    return Pet(name)
 
 def start():
     print_cool("Welcome to Pakistans Slave Labor Simulator!")
@@ -177,13 +214,12 @@ def start():
     print_cool("...", 0.5)
     sleep(1)
     print_cool("Anyway, lets get you started")
-    sleep(0.5)
     print_cool("I'm giving you this stater pig for free, but don't expect any more charity outta me")
-    sleep(0.5)
     print_cool("You know, like, inflation, or something")
-    sleep(0.5)
     print_cool("Make sure it doesn't die, and don't overwork it")
-    sleep(0.5)
     print_cool("Good luck, I guess")
+    sleep(2)
+    return [new_pet()]
 
-menu()
+while True:
+    pets = menu(pets)
