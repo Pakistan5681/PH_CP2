@@ -1,5 +1,6 @@
 from time import sleep
 from pakistans_functions import *
+from random import randint
 
 class Pet:
     def __init__(self, name):
@@ -55,18 +56,18 @@ class Pet:
 
     def feed(self, food_type):
         match food_type:
-            case "default":
+            case "Basic Food":
                 self.hunger += 50
-            case "super":
+            case "Super Food":
                 self.hunger = 100
                 self.energy += 15
-            case "wet":
+            case "Wet Food":
                 self.hunger += 50
                 self.thirst += 50
-            case "medicinal":
+            case "Medicinal Food":
                 self.hunger += 50
                 self.health += 15
-            case "tasty":
+            case "Tasty Food":
                 self.hunger += 50
                 self.happiness += 15
 
@@ -76,7 +77,7 @@ class Pet:
     def water(self):
         self.thirst += 50
         if self.thirst > 100: self.thirst = 100
-        print_cool(f"Fed {self.name} drank much water (maybe a little too much if you ask me)")
+        print_cool(f"{self.name} drank much water (maybe a little too much if you ask me)")
 
     def send_to_bed(self):
         self.awake = False
@@ -124,49 +125,130 @@ class Pet:
             return f"{self.name} died at age {self.age}"
         
     def interaction_options(self, inventory):
-        print("1. Feed")
-        option = idiot_proof_num_range("Select the number of desired options", 1, 7)
-        match option:
-            case 1:
-                self.feed("default")
-            case 2:
-                self.water()
-            case 3:
-                self.play()
-            case 4:
-                self.send_to_bed()
+        options = ["1", "2", "3", "4", '5', '6']
+        while True:
+            print(" ")
+            print_cool("1. Feed", 0.01)
+            print_cool("2. Water", 0.01)
+            print_cool("3. Play", 0.01)
+            print_cool("4. Send to Bed", 0.01)
+            print_cool("5. Display Status", 0.01)
+            print_cool("6. Exit", 0.01)
+            option = idiot_proof_specific("Select the number of desired option ", options, "Either you already did that or that isn't a valid option")
+            match option:
+                case '1':
+                    self.feed("Basic Food")
+                    options.remove('1')
+                case '2':
+                    self.water()
+                    options.remove('2')
+                case '3':
+                    self.play()
+                    options.remove('3')
+                case '4':
+                    self.send_to_bed()
+                    break
+                case '5':
+                    self.print_status()
+                case '6':
+                    break
+
+class Inv_Item:
+    def __init__(self, name, amount, type, shop_price):
+        self.name = name
+        self.amount = amount
+        self.type = type
+        self.shop_price = shop_price
+
+shop = [
+    Inv_Item("Basic Food", 1, "feed", 5),
+    Inv_Item("Super Food", 1, "feed", 10),
+    Inv_Item("Wet Food", 1, "feed", 7),
+    Inv_Item("Medicinal Food", 1, "feed", 12),
+    Inv_Item("Tasty Food", 1, "feed", 8),
+    Inv_Item("Infinite Basic Food", 1, "feed", 500),
+    Inv_Item("Infinite Super Food", 1, "feed", 1500),
+    Inv_Item("Infinite Wet Food", 1, "feed", 750),
+    Inv_Item("Infinite Medicinal Food", 1, "feed", 2000),
+    Inv_Item("Infinite Tasty Food", 1, "feed", 1250),
+    Inv_Item("Auto-feeder", 1, "automation", 300),
+    Inv_Item("Advanced Auto-feeder", 1, "automation", 750),
+    Inv_Item("Auto-water", 1, "automation", 250)
+]
                 
-
 pets = []
+inventory = [Inv_Item("Basic Food", 5, "feed", 5)]
+money = 0
 
-def menu(pets):
+def menu(pets, money):
     if bool(pets):
-        day(pets)
+        pets, money = day(pets)
     else:
         pets = fast_start()
         day(pets)
 
-    return pets
+    return pets, money
 
 def day(pets):
-    print(" ")
-    for i in pets: 
-        print_cool(i.basic_print())
-        i.day_stat_change()
-        
-    currentPet = 0
-    while True:
-        pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
-        print(" ")
-        if pets[get_pet_index(pet, pets)].awake and pets[get_pet_index(pet, pets)].alive:
-            currentPet = get_pet_index(pet, pets)
-            break
-        else:
-            if not pets[get_pet_index(pet, pets)].alive: print_cool("That pet is dead")
-            elif not pets[get_pet_index(pet, pets)].awake: print_cool("That pet is sleeping")
+    if idiot_proof_yes_no("Would you like to buy something? "):
 
-    pets[currentPet].print_status()
-    pets[currentPet].interaction_options([])
+
+    for i in pets: i.day_stat_change()
+    while True:
+        validPets = []
+        print(" ")
+        for i in pets: 
+            print_cool(i.basic_print())
+            if i.alive and i.awake:
+                validPets.append(i)
+
+        if not bool(validPets): break
+
+        currentPet = 0
+        while True:
+            pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
+            print(" ")
+            if pets[get_pet_index(pet, pets)].awake and pets[get_pet_index(pet, pets)].alive:
+                currentPet = get_pet_index(pet, pets)
+                break
+            else:
+                if not pets[get_pet_index(pet, pets)].alive: print_cool("That pet is dead")
+                elif not pets[get_pet_index(pet, pets)].awake: print_cool("That pet is sleeping")
+
+        pets[currentPet].print_status()
+        pets[currentPet].interaction_options([])
+
+        if not idiot_proof_yes_no("Would you like to interact with another pet? "):
+            break
+
+    print_cool("Your pigs are working")
+    money = getMone(pets)
+    return pets, money
+    
+def getAmount(chance):
+    if chance >= 100:
+        return 50
+    elif chance >= 75:
+        return 25
+    elif chance >= 50:
+        return 13
+    elif chance >= 25:
+        return 7
+    elif chance >= 10:
+        return 3
+    else:
+        return 1
+
+
+def getMone(pets):
+    total = 0
+    for i in pets:
+        if i.awake and i.alive:
+            chance = i.skill + randint(0, 100)
+            total += getAmount(chance)
+
+    print_cool(f"You earned ${total} today")
+    return total    
 
 def get_pet_names(pets):
     out = []
@@ -209,4 +291,4 @@ def fast_start():
 
 
 while True:
-    pets = menu(pets)
+    pets, money = menu(pets, money)
