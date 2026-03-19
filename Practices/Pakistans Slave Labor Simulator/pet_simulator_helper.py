@@ -54,7 +54,39 @@ class Pet:
 
         self.normalize_vars()
 
-    def feed(self, food_type):
+    def feed(self, inventory):
+        # Food name : [inInventory, isInfinite]
+        foods = {
+            "Basic Food": [False, False],
+            "Super Food": [False, False],
+            "Wet Food": [False, False],
+            "Medicinal Food": [False, False],
+            "Tasty Food": [False, False],
+        }
+
+        foodTypes = ["Basic Food", "Super Food", "Wet Food", "Medicinal Food", "Tasty Food"]
+        infinite = False
+
+        for i in inventory:
+            if i.name == "Basic Food": foods["Basic Food"] = [True, False]
+            if i.name == "Infinite Basic Food": foods["Basic Food"] = [True, True]
+            if i.name == "Super Food": foods["Super Food"] = [True, False]
+            if i.name == "Infinite Super Food": foods["Super Food"] = [True, True]
+            if i.name == "Wet Food": foods["Wet Food"] = [True, False]
+            if i.name == "Infinite Wet Food": foods["Wet Food"] = [True, True]
+            if i.name == "Medicinal Food": foods["Medicinal Food"] = [True, False]
+            if i.name == "Infinite Medicinal Food": foods["Medicinal Food"] = [True, True]
+            if i.name == "Tasty Food": foods["Tasty Food"] = [True, False]
+            if i.name == "Infinite Tasty Food": foods["Tasty Food"] = [True, True]
+
+        while True:
+            print(" ")
+            food_type = idiot_proof_specific(f"What food type do you want to feed {self.name}? ", foodTypes)     
+            if foods[food_type][0]: 
+                if foods[food_type][1]: infinite = True
+                break
+            else: print_cool("You dont have that food ):")
+
         match food_type:
             case "Basic Food":
                 self.hunger += 50
@@ -71,6 +103,13 @@ class Pet:
                 self.hunger += 50
                 self.happiness += 15
 
+        itemToRemove = ""
+        for i in inventory:
+            if i.name == food_type:
+                itemToRemove = i
+                break
+
+        inventory = removeItemFromInventorY(inventory, itemToRemove)
         print_cool(f"Fed {self.name} {food_type} feed")
         self.normalize_vars()
 
@@ -177,7 +216,8 @@ shop = [
     Inv_Item("Auto-feeder", 1, "automation", 300),
     Inv_Item("Advanced Auto-feeder", 1, "automation", 750),
     Inv_Item("Auto-water", 1, "automation", 250),
-    Inv_Item("The Funinator", 1, "automation", 425)
+    Inv_Item("The Funinator", 1, "automation", 425),
+    Inv_Item("Pig Egg", 1, "egg", "100")
 ]
 
 # Automation
@@ -197,15 +237,27 @@ def menu(pets, money, inventory, shop):
         pets = fast_start()
         day(pets, inventory, money, shop)
 
-    return pets, money
+    return pets, money, inventory
 
 def addItemToInventory(inventory, itemToAdd):
+    addedItem = False
     for i in inventory:
         if i.name == itemToAdd.name:
             i.amount += itemToAdd.amount
+            addedItem = True
             break
 
-    inventory.append(itemToAdd)
+    if not addedItem: inventory.append(itemToAdd)
+    return inventory
+
+def removeItemFromInventorY(inventory, itemToRemove):
+    for i in inventory:
+        if i.name == itemToRemove.name:
+            i.amount -= 1
+            break
+
+    if itemToRemove.amount <= 0: inventory.remove(itemToRemove)
+
     return inventory
 
 def goToShop(inventory, shop, money):
@@ -236,6 +288,7 @@ def goToShop(inventory, shop, money):
     return inventory, money
 
 def day(pets, inventory, money, shop):
+    print_cool("The day begins\n")
     if idiot_proof_yes_no("Would you like to buy something? "):
         inventory, money = goToShop(inventory, shop, money)
 
@@ -250,23 +303,24 @@ def day(pets, inventory, money, shop):
 
         if not bool(validPets): break
 
-        currentPet = 0
-        while True:
-            pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
-            print(" ")
-            if pets[get_pet_index(pet, pets)].awake and pets[get_pet_index(pet, pets)].alive:
-                currentPet = get_pet_index(pet, pets)
-                break
-            else:
-                if not pets[get_pet_index(pet, pets)].alive: print_cool("That pet is dead")
-                elif not pets[get_pet_index(pet, pets)].awake: print_cool("That pet is sleeping")
+        if idiot_proof_yes_no("Would you like to interact with pets today? "):
+            currentPet = 0
+            while True:
+                pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
+                print(" ")
+                if pets[get_pet_index(pet, pets)].awake and pets[get_pet_index(pet, pets)].alive:
+                    currentPet = get_pet_index(pet, pets)
+                    break
+                else:
+                    if not pets[get_pet_index(pet, pets)].alive: print_cool("That pet is dead")
+                    elif not pets[get_pet_index(pet, pets)].awake: print_cool("That pet is sleeping")
 
         pets[currentPet].print_status()
         pets[currentPet].interaction_options([])
 
         if not idiot_proof_yes_no("Would you like to interact with another pet? "): break
 
-    print_cool("Your pigs are working")
+    print_cool("Your pigs are digging for truffles")
     money = getMone(pets)
     return pets, money, inventory
     
