@@ -70,22 +70,26 @@ class Pet:
                 self.hunger += 50
                 self.happiness += 15
 
+        print_cool(f"Fed {self.name} {food_type} feed")
         self.normalize_vars()
 
     def water(self):
         self.thirst += 50
         if self.thirst > 100: self.thirst = 100
+        print_cool(f"Fed {self.name} drank much water (maybe a little too much if you ask me)")
 
     def send_to_bed(self):
         self.awake = False
         self.energy = 100
+        print_cool(f"{self.name} is now asleep")
 
-    def play(self, total_fun):
+    def play(self):
         self.happiness += 50
         self.hunger -= 5
         self.thirst -= 5
         self.energy -= 25
         self.normalize_vars()
+        print_cool(f"{self.name} had fun playing (i think)")
 
     def print_status(self):
         def get_bar(amount, name):
@@ -119,11 +123,19 @@ class Pet:
         else:
             return f"{self.name} died at age {self.age}"
         
-    def interaction_options():
+    def interaction_options(self, inventory):
         print("1. Feed")
         option = idiot_proof_num_range("Select the number of desired options", 1, 7)
         match option:
-            case 1
+            case 1:
+                self.feed("default")
+            case 2:
+                self.water()
+            case 3:
+                self.play()
+            case 4:
+                self.send_to_bed()
+                
 
 pets = []
 
@@ -150,9 +162,11 @@ def day(pets):
             currentPet = get_pet_index(pet, pets)
             break
         else:
-            print_cool("That pet is not availible")
+            if not pets[get_pet_index(pet, pets)].alive: print_cool("That pet is dead")
+            elif not pets[get_pet_index(pet, pets)].awake: print_cool("That pet is sleeping")
 
     pets[currentPet].print_status()
+    pets[currentPet].interaction_options([])
 
 def get_pet_names(pets):
     out = []
