@@ -18,6 +18,16 @@ class Enemy:
         self.velY = velY
         self.speed = speed
 
+class Bullet:
+    def __init__(self, x, y, collider, velX, velY, pierce):
+        self.x = x
+        self.y = y
+        self.collider = collider
+        self.velX = velX
+        self.velY = velY
+        self.pierce = pierce
+        self.remainingPierce = pierce
+
 py.init()
 
 potUpgradesRaw = [
@@ -42,6 +52,10 @@ potUpgradesRaw = [
     Upgrade("Intelligent", "Knowledge", 2, "rare", "Increases XP per kill by 2"),
     Upgrade("Genius", "Knowledge", 3, "epic", "Increases XP per kill by 3"),
     Upgrade("Infinite Wisdom", "Knowledge", 5, "pakistinian", "Increases XP per kill by 5"),
+    Upgrade("Pointy Projectiles", "Pierce", 1, "common", "Increases bullet pierce by 1"),
+    Upgrade("Blade Bullets", "Pierce", 2, "rare", "Increases bullet pierce by 2"),
+    Upgrade("Sharp Shooting", "Pierce", 3, "epic", "Increases bullet pierce by 3"),
+    Upgrade("Pakistinian Pew-Pew", "Pierce", 4, "pakistinian", "Increases bullet pierce by 4"),
 ]
 
 potUpgrades = []
@@ -94,8 +108,8 @@ reloadTime = 15
 
 # Bullets
 bullets = []
-bulletColliders = []
 bulletSpeed = 10
+bulletPierce = 1
 
 # Enemies
 regfoes = []
@@ -106,7 +120,7 @@ acceleration = 0.067
 
 # Spawn Rate
 regSpawnTime = 20
-regSpawnIncreaseTime = 180
+regSpawnIncreaseTime = 420
 regSpawnIncreaseClock = 0
 minSpawnTime = 2
 
@@ -247,7 +261,7 @@ while running:
     direction = direction.normalize() * bulletSpeed   
     
     if keys[py.K_SPACE] and not reloading:
-        bullets.append([playerX + 50, playerY + 50, direction.x, direction.y])
+        bullets.append(Bullet(playerX + 50, playerY + 50, py.Rect(playerX + 50, playerY + 50), direction.x, direction.y))
         reloading = True
         reloadClock = 0
 
