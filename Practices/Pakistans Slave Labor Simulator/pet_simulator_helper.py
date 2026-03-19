@@ -160,6 +160,9 @@ class Inv_Item:
         self.type = type
         self.shop_price = shop_price
 
+    def __str__(self):
+        return f"{self.name}: ${self.shop_price}"
+
 shop = [
     Inv_Item("Basic Food", 1, "feed", 5),
     Inv_Item("Super Food", 1, "feed", 10),
@@ -173,25 +176,68 @@ shop = [
     Inv_Item("Infinite Tasty Food", 1, "feed", 1250),
     Inv_Item("Auto-feeder", 1, "automation", 300),
     Inv_Item("Advanced Auto-feeder", 1, "automation", 750),
-    Inv_Item("Auto-water", 1, "automation", 250)
+    Inv_Item("Auto-water", 1, "automation", 250),
+    Inv_Item("The Funinator", 1, "automation", 425)
 ]
+
+# Automation
+autofeeder_active = False
+autofeed_type ="Basic Food"
+autowater_active = False
+funinator_active = False
                 
 pets = []
 inventory = [Inv_Item("Basic Food", 5, "feed", 5)]
 money = 0
 
-def menu(pets, money):
+def menu(pets, money, inventory, shop):
     if bool(pets):
-        pets, money = day(pets)
+        pets, money, inventory = day(pets, inventory, money, shop)
     else:
         pets = fast_start()
-        day(pets)
+        day(pets, inventory, money, shop)
 
     return pets, money
 
-def day(pets):
-    if idiot_proof_yes_no("Would you like to buy something? "):
+def addItemToInventory(inventory, itemToAdd):
+    for i in inventory:
+        if i.name == itemToAdd.name:
+            i.amount += itemToAdd.amount
+            break
 
+    inventory.append(itemToAdd)
+    return inventory
+
+def goToShop(inventory, shop, money):
+    names = []
+    nameItemRef={}
+    for i in shop: 
+        print(i)
+        names.append(i.name)
+        nameItemRef[i.name] = i
+    print(" ")
+    names.append("quit")
+
+    while True:
+        print_cool(f"You have ${money}")
+        itemToBuy = idiot_proof_specific("Type the name of the item you would like to buy.\nType 'quit' to leave the menu: ", names)
+
+        if itemToBuy == 'quit': break
+
+        if nameItemRef[itemToBuy].shop_price > money:
+            print_cool("You are too poor to buy that. Womp womp.")
+            continue
+
+        if not idiot_proof_yes_no(f"Are you sure you want to buy {itemToBuy}? "): continue
+
+        money -= nameItemRef[itemToBuy].shop_price
+        inventory = addItemToInventory(inventory, nameItemRef[itemToBuy])
+
+    return inventory, money
+
+def day(pets, inventory, money, shop):
+    if idiot_proof_yes_no("Would you like to buy something? "):
+        inventory, money = goToShop(inventory, shop, money)
 
     for i in pets: i.day_stat_change()
     while True:
@@ -218,12 +264,11 @@ def day(pets):
         pets[currentPet].print_status()
         pets[currentPet].interaction_options([])
 
-        if not idiot_proof_yes_no("Would you like to interact with another pet? "):
-            break
+        if not idiot_proof_yes_no("Would you like to interact with another pet? "): break
 
     print_cool("Your pigs are working")
     money = getMone(pets)
-    return pets, money
+    return pets, money, inventory
     
 def getAmount(chance):
     if chance >= 100:
@@ -291,4 +336,4 @@ def fast_start():
 
 
 while True:
-    pets, money = menu(pets, money)
+    pets, money, inventory = menu(pets, money, inventory, shop)
