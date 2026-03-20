@@ -335,7 +335,7 @@ def day(pets, inventory, money, shop):
             case 3:
                 printInventory(inventory)
             case 4:
-                pass
+                inventory, pets = useItem(inventory, pets)
             case 5:
                 print_cool("Your pigs are digging for truffles")
                 money = getMone(pets)
@@ -361,8 +361,6 @@ def useItem(inventory, pets):
     else:
         print("Yoou have nothing that can be used")
         return inventory, pets
-
-    
 
 def getAmount(chance):
     if chance >= 100:
