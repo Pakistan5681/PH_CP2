@@ -183,7 +183,7 @@ def float_to_int(num_float):
     num_float = round(num_float, 0)
     return int(num_float)
 
-def print_cool(statement, delay=0.05):
+def print_cool(statement, delay=0.025):
     """
     Like a normal print statement, but displays characters one at a time with a short interval.
 

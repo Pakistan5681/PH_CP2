@@ -79,6 +79,10 @@ class Pet:
             if i.name == "Tasty Food": foods["Tasty Food"] = [True, False]
             if i.name == "Infinite Tasty Food": foods["Tasty Food"] = [True, True]
 
+        for i in inventory:
+            if i.type == "feed":
+                print(f"You have {i.name}")
+
         while True:
             print(" ")
             food_type = idiot_proof_specific(f"What food type do you want to feed {self.name}? ", foodTypes)     
@@ -143,7 +147,7 @@ class Pet:
             out += " "
             out += f"({amount}%)"
 
-            print_cool(out, 0.025)
+            print(out)
 
         print(f"name: {self.name}")
         print(f"age: {self.age}")
@@ -176,7 +180,7 @@ class Pet:
             option = idiot_proof_specific("Select the number of desired option ", options, "Either you already did that or that isn't a valid option")
             match option:
                 case '1':
-                    self.feed("Basic Food")
+                    self.feed(inventory)
                     options.remove('1')
                 case '2':
                     self.water()
@@ -289,41 +293,57 @@ def goToShop(inventory, shop, money):
 
 def day(pets, inventory, money, shop):
     print_cool("The day begins\n")
-    if idiot_proof_yes_no("Would you like to buy something? "):
-        inventory, money = goToShop(inventory, shop, money)
 
-    for i in pets: i.day_stat_change()
     while True:
-        validPets = []
+        print("1. Interact with pets")
+        print("2. Go to market")
+        print("3. Look at inventory")
+        print("4. Use an item")
+        print("5. Send pigs to work and end the day")
+        print("6. End the day without working the pigs")
         print(" ")
-        for i in pets: 
-            print_cool(i.basic_print())
-            if i.alive and i.awake:
-                validPets.append(i)
+        option = idiot_proof_num_range("Enter the number of the desired option ", 1, 6)
 
-        if not bool(validPets): break
+        match option:
+            case 1:
+                for i in pets: i.day_stat_change()
+                while True:
+                    validPets = []
+                    print(" ")
+                    for i in pets: 
+                        print_cool(i.basic_print())
+                        if i.alive and i.awake:
+                            validPets.append(i)
 
-        if idiot_proof_yes_no("Would you like to interact with pets today? "):
-            currentPet = 0
-            while True:
-                pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
-                print(" ")
-                if pets[get_pet_index(pet, pets)].awake and pets[get_pet_index(pet, pets)].alive:
-                    currentPet = get_pet_index(pet, pets)
-                    break
-                else:
-                    if not pets[get_pet_index(pet, pets)].alive: print_cool("That pet is dead")
-                    elif not pets[get_pet_index(pet, pets)].awake: print_cool("That pet is sleeping")
+                    if not bool(validPets): break
 
-        pets[currentPet].print_status()
-        pets[currentPet].interaction_options([])
+                    currentPet = 0
+                    while True:
+                        pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
+                        print(" ")
+                        if pets[get_pet_index(pet, pets)].awake and pets[get_pet_index(pet, pets)].alive:
+                            currentPet = get_pet_index(pet, pets)
+                            break
+                        else:
+                            if not pets[get_pet_index(pet, pets)].alive: print_cool("That pet is dead")
+                            elif not pets[get_pet_index(pet, pets)].awake: print_cool("That pet is sleeping")
+                    pets[currentPet].print_status()
+                    pets[currentPet].interaction_options(inventory)
+                    if not idiot_proof_yes_no("Would you like to interact with another pet? "): break
+            case 2:
+                inventory, money = goToShop(inventory, shop, money)
+            case 3:
+                printInventory(inventory)
+            case 4:
+                pass
+            case 5:
+                print_cool("Your pigs are digging for truffles")
+                money = getMone(pets)
+                return pets, money, inventory
+            case 6:
+                return pets, money, inventory
 
-        if not idiot_proof_yes_no("Would you like to interact with another pet? "): break
 
-    print_cool("Your pigs are digging for truffles")
-    money = getMone(pets)
-    return pets, money, inventory
-    
 def getAmount(chance):
     if chance >= 100:
         return 50
@@ -337,7 +357,11 @@ def getAmount(chance):
         return 3
     else:
         return 1
-
+    
+def printInventory(inventory):
+    for i in inventory:
+        print_cool(f"You have {i.amount} {i.name}(s)")
+        input("Hit enter to continue")
 
 def getMone(pets):
     total = 0
