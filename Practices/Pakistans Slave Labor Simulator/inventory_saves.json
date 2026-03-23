@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Basic Food",
+        "amount": 5,
+        "type": "feed",
+        "shop_price": 5
+    },
+    {
+        "name": "Infinite Basic Food",
+        "amount": 1,
+        "type": "feed",
+        "shop_price": 500
+    },
+    {
+        "name": "Auto-feeder",
+        "amount": 1,
+        "type": "consumable",
+        "shop_price": 300
+    }
+]

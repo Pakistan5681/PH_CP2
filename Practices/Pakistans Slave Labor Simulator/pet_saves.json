@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Jorp",
+        "age": 0,
+        "hunger": 40,
+        "thirst": 40,
+        "health": 100,
+        "happiness": 40,
+        "energy": 100,
+        "awake": true,
+        "alive": true,
+        "skill": 5
+    }
+]

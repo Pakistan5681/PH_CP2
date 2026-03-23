@@ -219,10 +219,10 @@ shop = [
     Inv_Item("Infinite Wet Food", 1, "feed", 750),
     Inv_Item("Infinite Medicinal Food", 1, "feed", 2000),
     Inv_Item("Infinite Tasty Food", 1, "feed", 1250),
-    Inv_Item("Auto-feeder", 1, "automation", 300),
-    Inv_Item("Advanced Auto-feeder", 1, "automation", 750),
-    Inv_Item("Auto-water", 1, "automation", 250),
-    Inv_Item("The Funinator", 1, "automation", 425),
+    Inv_Item("Auto-feeder", 1, "consumable", 300),
+    Inv_Item("Advanced Auto-feeder", 1, "consumable", 750),
+    Inv_Item("Auto-water", 1, "consumable", 250),
+    Inv_Item("The Funinator", 1, "consumable", 425),
     Inv_Item("Pig Egg", 1, "consumable", 100)
 ]
 
@@ -235,16 +235,16 @@ automation = {
                 
 pets = []
 inventory = []
-money = 87000000000000
+money = 0
 
 def menu(pets, money, inventory, shop, automation):
     if bool(pets):
-        pets, money, inventory = day(pets, inventory, money, shop, automation)
+        pets, money, inventory, automation = day(pets, inventory, money, shop, automation)
     else:
         pets = fast_start()
         day(pets, inventory, money, shop, automation)
 
-    return pets, money, inventory
+    return pets, money, inventory, automation
 
 def addItemToInventory(inventory, itemToAdd):
     addedItem = False
@@ -309,6 +309,16 @@ def day(pets, inventory, money, shop, automation):
         print(" ")
         option = idiot_proof_num_range("Enter the number of the desired option ", 1, 7)
 
+        if automation["autofeeder_active"]:
+            infinite = False
+            hasFood = False
+            for i in pets:
+                for i in inventory:
+                    if automation["autofeed_type"] == i.name: hasFood = True
+                    if automation["autofeed_type"] == i.name.replace("Infinite ", ""): infinite = True
+
+            print(f"isInfinite: {infinite}")
+
         match option:
             case 1:
                 while True:
@@ -333,22 +343,24 @@ def day(pets, inventory, money, shop, automation):
                             elif not pets[get_pet_index(pet, pets)].awake: print_cool("That pet is sleeping")
                     pets[currentPet].print_status()
                     pets[currentPet].interaction_options(inventory)
-                    if not idiot_proof_yes_no("Would you like to interact with another pet? "): break
+                    if not idiot_proof_yes_no("Would you like to interact with another pet? "): 
+                        print(" ")
+                        break
             case 2:
                 inventory, money = goToShop(inventory, shop, money)
             case 3:
                 printInventory(inventory)
             case 4:
-                inventory, pets = useItem(inventory, pets, automation)
+                inventory, pets, automation = useItem(inventory, pets, automation)
             case 5:
                 pass
             case 6:
                 print_cool("Your pigs are digging for truffles")
                 money = getMone(pets)
-                saveData(pets)
+                saveData(pets, inventory, automation, money)
                 return pets, money, inventory, automation          
             case 7:
-                saveData(pets)
+                saveData(pets, inventory, automation, money)
                 return pets, money, inventory, automation
 
 
@@ -365,11 +377,13 @@ def useItem(inventory, pets, automation):
         use = idiot_proof_specific("What item do you want to use? ", useables)
         if use == "Pig Egg":
             pets.append(new_pet())
+        if use == "Auto-feeder":
+            automation["autofeeder_active"] = True
         
-        return inventory, pets
+        return inventory, pets, automation
     else:
         print("You have nothing that can be used")
-        return inventory, pets
+        return inventory, pets, automation
 
 def getAmount(chance):
     if chance >= 100:
@@ -386,9 +400,12 @@ def getAmount(chance):
         return 1
     
 def printInventory(inventory):
-    for i in inventory:
-        print_cool(f"You have {i.amount} {i.name}(s)")
-        input("Hit enter to continue")
+    if bool(inventory):
+        for i in inventory:
+            print_cool(f"You have {i.amount} {i.name}(s)")
+            input("Hit enter to continue")
+    else:
+        print_cool("You don't own anything poor u")
 
 def getMone(pets):
     total = 0
@@ -441,32 +458,38 @@ def fast_start():
 
 def saveData(pets, inventory, automation, money):
     # Saves pet data
-    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json"):
-        with open("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json", "w") as jFile:
+    if os.path.isfile("Practices/Pakistans Slave Labor Simulator/pet_saves.json"):
+        with open("Practices/Pakistans Slave Labor Simulator/pet_saves.json", "w") as jFile:
             petData = []
             for i in pets: 
                 petData.append(i.__dict__)
 
-            json.dump(petData, jFile, indent=4)\
+            json.dump(petData, jFile, indent=4)
+    else:
+        raise Exception("No file found dingus")
     
     # Saves inventory data
-    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\inventory_saves.json"):
-        with open("Practices\\Pakistans Slave Labor Simulator\\inventory_saves.json", "w") as file:
+    if os.path.isfile("Practices/Pakistans Slave Labor Simulator/inventory_saves.json"):
+        with open("Practices/Pakistans Slave Labor Simulator/inventory_saves.json", "w") as file:
             invData = []
             for i in inventory: 
                 invData.append(i.__dict__)
 
             json.dump(invData, file, indent=4)
+    else:
+        raise Exception("No file found dingus")
 
     # Saves money and automation
-    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\save_data.json"):
-        with open("Practices\\Pakistans Slave Labor Simulator\\save_data.json", "w") as file:
+    if os.path.isfile("Practices/Pakistans Slave Labor Simulator/save_data.json"):
+        with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "w") as file:
             data = {
                 "money" : money,
                 "automation" : automation
             }
 
             json.dump(data, file, indent=4)
+    else:
+        raise Exception("No file found dingus")
 
 def loadData():
     outPets = []
@@ -474,9 +497,9 @@ def loadData():
     outMoney = 0
     outAuto = {}
     # Loads pet data
-    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json"):
+    if os.path.isfile("Practices/Pakistans Slave Labor Simulator/pet_saves.json"):
         try:
-            with open("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json", "r") as jFile:
+            with open("Practices/Pakistans Slave Labor Simulator/pet_saves.json", "r") as jFile:
                 jsonData = json.load(jFile)
                 petDataRaw = []
                 petData = []
@@ -502,9 +525,9 @@ def loadData():
             outPets = []
     
     # Loads inventory data
-    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\inventory_saves.json"):
+    if os.path.isfile("Practices/Pakistans Slave Labor Simulator/inventory_saves.json"):
         try:
-            with open("Practices\\Pakistans Slave Labor Simulator\\inventory_saves.json", "r") as jFile:
+            with open("Practices/Pakistans Slave Labor Simulator/inventory_saves.json", "r") as jFile:
                 jsonData = json.load(jFile)
                 invDataRaw = []
                 invData = []
@@ -521,15 +544,15 @@ def loadData():
             outInv = [Inv_Item("Basic Food", 5, "feed", 5)]
     
     # Loads money and automation
-    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\save_data.json"):
+    if os.path.isfile("Practices/Pakistans Slave Labor Simulator/save_data.json"):
         try:
-            with open("Practices\\Pakistans Slave Labor Simulator\\save_data.json", "r") as jFile:
+            with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "r") as jFile:
                 jsonData = json.load(jFile)
 
                 outMoney = jsonData["money"]
                 outAuto = jsonData["automation"]
         except json.JSONDecodeError:
-            outMoney = 0
+            outMoney = 34893492483243343
             outAuto = {
                 "autofeeder_active" : False,
                 "autofeed_type" : "Basic Food",
