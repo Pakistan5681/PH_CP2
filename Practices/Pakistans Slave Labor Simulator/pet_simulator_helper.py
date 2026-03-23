@@ -223,7 +223,7 @@ shop = [
     Inv_Item("Advanced Auto-feeder", 1, "automation", 750),
     Inv_Item("Auto-water", 1, "automation", 250),
     Inv_Item("The Funinator", 1, "automation", 425),
-    Inv_Item("Pig Egg", 1, "egg", "100")
+    Inv_Item("Pig Egg", 1, "consumable", 100)
 ]
 
 # Automation
@@ -234,7 +234,7 @@ funinator_active = False
                 
 pets = []
 inventory = [Inv_Item("Basic Food", 5, "feed", 5)]
-money = 0
+money = 87000000000000
 
 def menu(pets, money, inventory, shop):
     if bool(pets):
@@ -295,6 +295,7 @@ def goToShop(inventory, shop, money):
 
 def day(pets, inventory, money, shop):
     print_cool("The day begins\n")
+    for i in pets: i.day_stat_change()
 
     while True:
         print("1. Interact with pets")
@@ -308,7 +309,6 @@ def day(pets, inventory, money, shop):
 
         match option:
             case 1:
-                for i in pets: i.day_stat_change()
                 while True:
                     validPets = []
                     print(" ")
@@ -337,7 +337,7 @@ def day(pets, inventory, money, shop):
             case 3:
                 printInventory(inventory)
             case 4:
-                pass
+                inventory, pets = useItem(inventory, pets)
             case 5:
                 print_cool("Your pigs are digging for truffles")
                 money = getMone(pets)
@@ -347,6 +347,25 @@ def day(pets, inventory, money, shop):
                 saveData(pets)
                 return pets, money, inventory
 
+
+def useItem(inventory, pets):
+    useable = False
+    useables = []
+    for i in inventory:
+        if i.type == "consumable":
+            print(f"You have {i.amount} {i.name}(s)")
+            useable = True
+            useables.append(i.name)
+
+    if useable:
+        use = idiot_proof_specific("What item do you want to use? ", useables)
+        if use == "Pig Egg":
+            pets.append(new_pet())
+        
+        return inventory, pets
+    else:
+        print("Yoou have nothing that can be used")
+        return inventory, pets
 
 def getAmount(chance):
     if chance >= 100:
