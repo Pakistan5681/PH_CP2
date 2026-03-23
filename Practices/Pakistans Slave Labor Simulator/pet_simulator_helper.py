@@ -112,7 +112,7 @@ class Pet:
         itemToRemove = ""
         for i in inventory:
             if i.name == food_type:
-                itemToRemove = i
+                if not foods[food_type][1]: itemToRemove = i
                 break
 
         inventory = removeItemFromInventorY(inventory, itemToRemove)
@@ -226,22 +226,23 @@ shop = [
     Inv_Item("Pig Egg", 1, "consumable", 100)
 ]
 
-# Automation
-autofeeder_active = False
-autofeed_type ="Basic Food"
-autowater_active = False
-funinator_active = False
+automation = {
+    "autofeeder_active" : False,
+    "autofeed_type" : "Basic Food",
+    "autowater_active" : False, 
+    "funinator_active" : False
+}
                 
 pets = []
-inventory = [Inv_Item("Basic Food", 5, "feed", 5)]
+inventory = []
 money = 87000000000000
 
-def menu(pets, money, inventory, shop):
+def menu(pets, money, inventory, shop, automation):
     if bool(pets):
-        pets, money, inventory = day(pets, inventory, money, shop)
+        pets, money, inventory = day(pets, inventory, money, shop, automation)
     else:
         pets = fast_start()
-        day(pets, inventory, money, shop)
+        day(pets, inventory, money, shop, automation)
 
     return pets, money, inventory
 
@@ -293,7 +294,7 @@ def goToShop(inventory, shop, money):
 
     return inventory, money
 
-def day(pets, inventory, money, shop):
+def day(pets, inventory, money, shop, automation):
     print_cool("The day begins\n")
     for i in pets: i.day_stat_change()
 
@@ -302,10 +303,11 @@ def day(pets, inventory, money, shop):
         print("2. Go to market")
         print("3. Look at inventory")
         print("4. Use an item")
-        print("5. Send pigs to work and end the day")
-        print("6. End the day without working the pigs")
+        print("5. Configure automation")
+        print("6. Send pigs to work and end the day")
+        print("7. End the day without working the pigs")
         print(" ")
-        option = idiot_proof_num_range("Enter the number of the desired option ", 1, 6)
+        option = idiot_proof_num_range("Enter the number of the desired option ", 1, 7)
 
         match option:
             case 1:
@@ -337,18 +339,20 @@ def day(pets, inventory, money, shop):
             case 3:
                 printInventory(inventory)
             case 4:
-                inventory, pets = useItem(inventory, pets)
+                inventory, pets = useItem(inventory, pets, automation)
             case 5:
+                pass
+            case 6:
                 print_cool("Your pigs are digging for truffles")
                 money = getMone(pets)
                 saveData(pets)
-                return pets, money, inventory             
-            case 6:
+                return pets, money, inventory, automation          
+            case 7:
                 saveData(pets)
-                return pets, money, inventory
+                return pets, money, inventory, automation
 
 
-def useItem(inventory, pets):
+def useItem(inventory, pets, automation):
     useable = False
     useables = []
     for i in inventory:
@@ -364,7 +368,7 @@ def useItem(inventory, pets):
         
         return inventory, pets
     else:
-        print("Yoou have nothing that can be used")
+        print("You have nothing that can be used")
         return inventory, pets
 
 def getAmount(chance):
@@ -435,7 +439,7 @@ def start():
 def fast_start():
     return [Pet("Jorp")]
 
-def saveData(pets, inventory):
+def saveData(pets, inventory, automation, money):
     # Saves pet data
     if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json"):
         with open("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json", "w") as jFile:
@@ -454,9 +458,21 @@ def saveData(pets, inventory):
 
             json.dump(invData, file, indent=4)
 
+    # Saves money and automation
+    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\save_data.json"):
+        with open("Practices\\Pakistans Slave Labor Simulator\\save_data.json", "w") as file:
+            data = {
+                "money" : money,
+                "automation" : automation
+            }
+
+            json.dump(data, file, indent=4)
+
 def loadData():
     outPets = []
     outInv = []
+    outMoney = 0
+    outAuto = {}
     # Loads pet data
     if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json"):
         try:
@@ -502,10 +518,27 @@ def loadData():
 
                 outInv = invData
         except json.JSONDecodeError:
-            outInv = []
+            outInv = [Inv_Item("Basic Food", 5, "feed", 5)]
+    
+    # Loads money and automation
+    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\save_data.json"):
+        try:
+            with open("Practices\\Pakistans Slave Labor Simulator\\save_data.json", "r") as jFile:
+                jsonData = json.load(jFile)
 
-    return outPets, outInv
+                outMoney = jsonData["money"]
+                outAuto = jsonData["automation"]
+        except json.JSONDecodeError:
+            outMoney = 0
+            outAuto = {
+                "autofeeder_active" : False,
+                "autofeed_type" : "Basic Food",
+                "autowater_active" : False, 
+                "funinator_active" : False
+            }
 
-pets, inventory = loadData()
+    return outPets, outInv, outMoney, outAuto
+
+pets, inventory, money, automation = loadData()
 while True:
-    pets, money, inventory = menu(pets, money, inventory, shop)
+    pets, money, inventory, automation = menu(pets, money, inventory, shop, automation)
