@@ -435,16 +435,77 @@ def start():
 def fast_start():
     return [Pet("Jorp")]
 
-def saveData(pets):
-    if os.path.isfile("Practices\Pakistans Slave Labor Simulator\pet_saves.json"):
-        with open("Practices\Pakistans Slave Labor Simulator\pet_saves.json", "w") as jFile:
+def saveData(pets, inventory):
+    # Saves pet data
+    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json"):
+        with open("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json", "w") as jFile:
             petData = []
             for i in pets: 
                 petData.append(i.__dict__)
-                print(i.__dict__)
 
-            json.dump(petData, jFile, indent=4)
+            json.dump(petData, jFile, indent=4)\
+    
+    # Saves inventory data
+    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\inventory_saves.json"):
+        with open("Practices\\Pakistans Slave Labor Simulator\\inventory_saves.json", "w") as file:
+            invData = []
+            for i in inventory: 
+                invData.append(i.__dict__)
 
+            json.dump(invData, file, indent=4)
 
+def loadData():
+    outPets = []
+    outInv = []
+    # Loads pet data
+    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json"):
+        try:
+            with open("Practices\\Pakistans Slave Labor Simulator\\pet_saves.json", "r") as jFile:
+                jsonData = json.load(jFile)
+                petDataRaw = []
+                petData = []
+
+                for i in jsonData: 
+                    petDataRaw.append(i)
+
+                for i in petDataRaw:
+                    newPet = Pet(i["name"])
+                    newPet.age = i["age"]
+                    newPet.hunger = i["hunger"]
+                    newPet.thirst = i["thirst"]
+                    newPet.health = i["health"]
+                    newPet.happiness = i["happiness"]
+                    newPet.energy = i["energy"]
+                    newPet.awake = i["awake"]
+                    newPet.alive = i["alive"]
+                    newPet.skill = i["skill"]
+
+                    petData.append(newPet)
+                outPets = petData
+        except json.JSONDecodeError:
+            outPets = []
+    
+    # Loads inventory data
+    if os.path.isfile("Practices\\Pakistans Slave Labor Simulator\\inventory_saves.json"):
+        try:
+            with open("Practices\\Pakistans Slave Labor Simulator\\inventory_saves.json", "r") as jFile:
+                jsonData = json.load(jFile)
+                invDataRaw = []
+                invData = []
+
+                for i in jsonData: 
+                    invDataRaw.append(i)
+
+                for i in invDataRaw:
+                    invItem = Inv_Item(i["name"], i["amount"], i["type"], i["shop_price"])
+                    invData.append(invItem)
+
+                outInv = invData
+        except json.JSONDecodeError:
+            outInv = []
+
+    return outPets, outInv
+
+pets, inventory = loadData()
 while True:
     pets, money, inventory = menu(pets, money, inventory, shop)
