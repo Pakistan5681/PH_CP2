@@ -1,6 +1,8 @@
 from time import sleep
 from pakistans_functions import *
 from random import randint
+import os
+import json
 
 class Pet:
     def __init__(self, name):
@@ -339,8 +341,10 @@ def day(pets, inventory, money, shop):
             case 5:
                 print_cool("Your pigs are digging for truffles")
                 money = getMone(pets)
-                return pets, money, inventory
+                saveData(pets)
+                return pets, money, inventory             
             case 6:
+                saveData(pets)
                 return pets, money, inventory
 
 
@@ -411,6 +415,16 @@ def start():
 
 def fast_start():
     return [Pet("Jorp")]
+
+def saveData(pets):
+    if os.path.isfile("Practices\Pakistans Slave Labor Simulator\pet_saves.json"):
+        with open("Practices\Pakistans Slave Labor Simulator\pet_saves.json", "w") as jFile:
+            petData = []
+            for i in pets: 
+                petData.append(i.__dict__)
+                print(i.__dict__)
+
+            json.dump(petData, jFile, indent=4)
 
 
 while True:

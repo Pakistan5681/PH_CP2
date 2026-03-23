@@ -72,6 +72,3 @@ def start():
 
     drawTri(1)
     end()
-
-
-    
