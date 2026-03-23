@@ -56,6 +56,23 @@ class Pet:
 
         self.normalize_vars()
 
+    def autoFeed(self, foodType):
+        match foodType:
+            case "Basic Food":
+                self.hunger += 50
+            case "Super Food":
+                self.hunger = 100
+                self.energy += 15
+            case "Wet Food":
+                self.hunger += 50
+                self.thirst += 50
+            case "Medicinal Food":
+                self.hunger += 50
+                self.health += 15
+            case "Tasty Food":
+                self.hunger += 50
+                self.happiness += 15
+
     def feed(self, inventory):
         # Food name : [inInventory, isInfinite]
         foods = {
@@ -234,7 +251,7 @@ automation = {
 }
                 
 pets = []
-inventory = []
+inventory = [Inv_Item("Basic Food", 5, "feed", 5)]
 money = 0
 
 def menu(pets, money, inventory, shop, automation):
@@ -312,13 +329,23 @@ def day(pets, inventory, money, shop, automation):
         if automation["autofeeder_active"]:
             infinite = False
             hasFood = False
-            for i in pets:
+            failed = False
+            for p in pets:
                 for i in inventory:
                     if automation["autofeed_type"] == i.name: hasFood = True
-                    if automation["autofeed_type"] == i.name.replace("Infinite ", ""): infinite = True
-
-            print(f"isInfinite: {infinite}")
-
+                    if automation["autofeed_type"] == i.name.replace("Infinite ", "") and "Infinite" in i.name: 
+                        infinite = True
+                        hasFood = True
+                        
+                    if hasFood:
+                        p.autoFeed(automation["autofeed_type"])
+                        if not infinite: inventory = removeItemFromInventorY(inventory, i)
+                        print(f"Fed {p.name}")
+                    else:
+                        print("You didn't have enough food for the autofeeder")
+                        failed = True
+                        break
+                if failed: break
         match option:
             case 1:
                 while True:
@@ -554,7 +581,7 @@ def loadData():
         except json.JSONDecodeError:
             outMoney = 34893492483243343
             outAuto = {
-                "autofeeder_active" : False,
+                "autofeeder_active" : True,
                 "autofeed_type" : "Basic Food",
                 "autowater_active" : False, 
                 "funinator_active" : False
@@ -562,6 +589,14 @@ def loadData():
 
     return outPets, outInv, outMoney, outAuto
 
-pets, inventory, money, automation = loadData()
+if not idiot_proof_yes_no("Would you like to delete your old save and start fresh? "): pets, inventory, money, automation = loadData()
+else:
+    with open("Practices/Pakistans Slave Labor Simulator/pet_saves.json", "w") as file:
+        file.write("")
+    with open("Practices/Pakistans Slave Labor Simulator/inventory_saves.json", "w") as file:
+        file.write("")
+    with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "w") as file:
+        file.write("")
+
 while True:
     pets, money, inventory, automation = menu(pets, money, inventory, shop, automation)
