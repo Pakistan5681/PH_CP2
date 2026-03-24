@@ -1,0 +1,9 @@
+{
+    "money": 9873,
+    "automation": {
+        "autofeeder_active": true,
+        "autofeed_type": "Basic Food",
+        "autowater_active": true,
+        "funinator_active": true
+    }
+}

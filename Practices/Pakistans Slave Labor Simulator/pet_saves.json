@@ -1,0 +1,14 @@
+[
+    {
+        "name": "1",
+        "age": 12,
+        "hunger": 95,
+        "thirst": 95,
+        "health": 70,
+        "happiness": 100,
+        "energy": 0,
+        "awake": true,
+        "alive": true,
+        "skill": 5
+    }
+]

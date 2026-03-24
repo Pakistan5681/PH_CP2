@@ -72,6 +72,8 @@ class Pet:
             case "Tasty Food":
                 self.hunger += 50
                 self.happiness += 15
+        
+        self.normalize_vars()
 
     def feed(self, inventory):
         # Food name : [inInventory, isInfinite]
@@ -98,17 +100,23 @@ class Pet:
             if i.name == "Tasty Food": foods["Tasty Food"] = [True, False]
             if i.name == "Infinite Tasty Food": foods["Tasty Food"] = [True, True]
 
+        current = 1
+        foodIndex = {}
         for i in inventory:
             if i.type == "feed":
-                print(f"You have {i.name}")
+                print(f"You have {i.name} ({current})")
+                foodIndex[str(current)] = i.name
+                current += 1
 
         while True:
             print(" ")
-            food_type = idiot_proof_specific(f"What food type do you want to feed {self.name}? ", foodTypes)     
+
+            food_type = idiot_proof_specific(f"What food type do you want to feed {self.name}? Enter the number: ", list(foodIndex.keys()))     
+            food_type = foodIndex[food_type]
             if foods[food_type][0]: 
                 if foods[food_type][1]: infinite = True
                 break
-            else: print_cool("You dont have that food ):")
+            else: print("You dont have that food ):")
 
         match food_type:
             case "Basic Food":
@@ -133,18 +141,18 @@ class Pet:
                 break
 
         inventory = removeItemFromInventorY(inventory, itemToRemove)
-        print_cool(f"Fed {self.name} {food_type} feed")
+        print(f"Fed {self.name} {food_type}")
         self.normalize_vars()
 
     def water(self):
         self.thirst += 50
         if self.thirst > 100: self.thirst = 100
-        print_cool(f"{self.name} drank much water (maybe a little too much if you ask me)")
+        print(f"{self.name} drank much water (maybe a little too much if you ask me)")
 
     def send_to_bed(self):
         self.awake = False
         self.energy = 100
-        print_cool(f"{self.name} is now asleep")
+        print(f"{self.name} is now asleep")
 
     def play(self):
         self.happiness += 50
@@ -152,7 +160,7 @@ class Pet:
         self.thirst -= 5
         self.energy -= 25
         self.normalize_vars()
-        print_cool(f"{self.name} had fun playing (i think)")
+        print(f"{self.name} had fun playing (i think)")
 
     def print_status(self):
         def get_bar(amount, name):
@@ -190,12 +198,12 @@ class Pet:
         options = ["1", "2", "3", "4", '5', '6']
         while True:
             print(" ")
-            print_cool("1. Feed", 0.01)
-            print_cool("2. Water", 0.01)
-            print_cool("3. Play", 0.01)
-            print_cool("4. Send to Bed", 0.01)
-            print_cool("5. Display Status", 0.01)
-            print_cool("6. Exit", 0.01)
+            print("1. Feed")
+            print("2. Water")
+            print("3. Play")
+            print("4. Send to Bed")
+            print("5. Display Status")
+            print("6. Exit")
             option = idiot_proof_specific("Select the number of desired option ", options, "Either you already did that or that isn't a valid option")
             match option:
                 case '1':
@@ -258,7 +266,7 @@ def menu(pets, money, inventory, shop, automation):
     if bool(pets):
         pets, money, inventory, automation = day(pets, inventory, money, shop, automation)
     else:
-        pets = fast_start()
+        pets = start()
         day(pets, inventory, money, shop, automation)
 
     return pets, money, inventory, automation
@@ -295,25 +303,61 @@ def goToShop(inventory, shop, money):
     names.append("quit")
 
     while True:
-        print_cool(f"You have ${money}")
+        print(f"You have ${money}")
         itemToBuy = idiot_proof_specific("Type the name of the item you would like to buy.\nType 'quit' to leave the menu: ", names)
+        if itemToBuy != "quit": 
+            if nameItemRef[itemToBuy].type == "feed" and not "Infinite" in itemToBuy: amount = idiot_proof_general("How many do you want to buy? ")
+            else: amount = 1
 
         if itemToBuy == 'quit': break
 
-        if nameItemRef[itemToBuy].shop_price > money:
-            print_cool("You are too poor to buy that. Womp womp.")
+        if nameItemRef[itemToBuy].shop_price * amount > money:
+            print("You are too poor to buy that. Womp womp.")
             continue
 
-        if not idiot_proof_yes_no(f"Are you sure you want to buy {itemToBuy}? "): continue
+        if not idiot_proof_yes_no(f"Are you sure you want to buy {amount} {itemToBuy}? "): continue
 
-        money -= nameItemRef[itemToBuy].shop_price
-        inventory = addItemToInventory(inventory, nameItemRef[itemToBuy])
+        money -= nameItemRef[itemToBuy].shop_price * amount
+        item = nameItemRef[itemToBuy]
+        item.amount = amount
+        inventory = addItemToInventory(inventory, item)
+        print(" ")
 
     return inventory, money
 
 def day(pets, inventory, money, shop, automation):
-    print_cool("The day begins\n")
+    print("The day begins\n")
     for i in pets: i.day_stat_change()
+
+    if automation["autofeeder_active"]:
+            infinite = False
+            hasFood = False
+            failed = False
+            for p in pets:
+                if p.awake and p.alive:
+                    for i in inventory:
+                        if automation["autofeed_type"] == i.name: hasFood = True
+                        if automation["autofeed_type"] == i.name.replace("Infinite ", "") and "Infinite" in i.name: 
+                            infinite = True
+                            hasFood = True
+
+                        if hasFood:
+                            p.autoFeed(automation["autofeed_type"])
+                            if not infinite: inventory = removeItemFromInventorY(inventory, i)
+                            print(f"Fed {p.name}")
+                        else:
+                            print("You didn't have enough food for the autofeeder")
+                            failed = True
+                            break
+                    if failed: break
+
+    if automation["autowater_active"]:
+        for i in pets:
+            if i.awake and i.alive: i.water()
+    if automation["funinator_active"]:
+            for i in pets:
+                if i.awake and i.alive: i.play()
+    print(" ")
 
     while True:
         print("1. Interact with pets")
@@ -325,34 +369,13 @@ def day(pets, inventory, money, shop, automation):
         print("7. End the day without working the pigs")
         print(" ")
         option = idiot_proof_num_range("Enter the number of the desired option ", 1, 7)
-
-        if automation["autofeeder_active"]:
-            infinite = False
-            hasFood = False
-            failed = False
-            for p in pets:
-                for i in inventory:
-                    if automation["autofeed_type"] == i.name: hasFood = True
-                    if automation["autofeed_type"] == i.name.replace("Infinite ", "") and "Infinite" in i.name: 
-                        infinite = True
-                        hasFood = True
-                        
-                    if hasFood:
-                        p.autoFeed(automation["autofeed_type"])
-                        if not infinite: inventory = removeItemFromInventorY(inventory, i)
-                        print(f"Fed {p.name}")
-                    else:
-                        print("You didn't have enough food for the autofeeder")
-                        failed = True
-                        break
-                if failed: break
         match option:
             case 1:
                 while True:
                     validPets = []
                     print(" ")
                     for i in pets: 
-                        print_cool(i.basic_print())
+                        print(i.basic_print())
                         if i.alive and i.awake:
                             validPets.append(i)
 
@@ -366,8 +389,8 @@ def day(pets, inventory, money, shop, automation):
                             currentPet = get_pet_index(pet, pets)
                             break
                         else:
-                            if not pets[get_pet_index(pet, pets)].alive: print_cool("That pet is dead")
-                            elif not pets[get_pet_index(pet, pets)].awake: print_cool("That pet is sleeping")
+                            if not pets[get_pet_index(pet, pets)].alive: print("That pet is dead")
+                            elif not pets[get_pet_index(pet, pets)].awake: print("That pet is sleeping")
                     pets[currentPet].print_status()
                     pets[currentPet].interaction_options(inventory)
                     if not idiot_proof_yes_no("Would you like to interact with another pet? "): 
@@ -382,23 +405,29 @@ def day(pets, inventory, money, shop, automation):
             case 5:
                 pass
             case 6:
-                print_cool("Your pigs are digging for truffles")
-                money = getMone(pets)
+                print("Your pigs are digging for truffles")
+                money += getMone(pets)
                 saveData(pets, inventory, automation, money)
+                for i in pets: 
+                    if i.alive: i.age += 1
                 return pets, money, inventory, automation          
             case 7:
                 saveData(pets, inventory, automation, money)
+                for i in pets: 
+                    if i.alive: i.age += 1
                 return pets, money, inventory, automation
 
 
 def useItem(inventory, pets, automation):
     useable = False
     useables = []
+    nameItemRef = {}
     for i in inventory:
         if i.type == "consumable":
             print(f"You have {i.amount} {i.name}(s)")
             useable = True
             useables.append(i.name)
+            nameItemRef[i.name] = i
 
     if useable:
         use = idiot_proof_specific("What item do you want to use? ", useables)
@@ -406,7 +435,12 @@ def useItem(inventory, pets, automation):
             pets.append(new_pet())
         if use == "Auto-feeder":
             automation["autofeeder_active"] = True
+        if use == "Auto-water":
+            automation["autowater_active"] = True
+        if use == "The Funinator":
+            automation["funinator_active"] = True
         
+        inventory = removeItemFromInventorY(inventory, nameItemRef[use])
         return inventory, pets, automation
     else:
         print("You have nothing that can be used")
@@ -429,10 +463,11 @@ def getAmount(chance):
 def printInventory(inventory):
     if bool(inventory):
         for i in inventory:
-            print_cool(f"You have {i.amount} {i.name}(s)")
-            input("Hit enter to continue")
+            print(f"You have {i.amount} {i.name}(s)")
+
+        input("Hit enter to continue")
     else:
-        print_cool("You don't own anything poor u")
+        print("You don't own anything poor u")
 
 def getMone(pets):
     total = 0
@@ -441,7 +476,7 @@ def getMone(pets):
             chance = i.skill + randint(0, 100)
             total += getAmount(chance)
 
-    print_cool(f"You earned ${total} today")
+    print(f"You earned ${total} today")
     return total    
 
 def get_pet_names(pets):
@@ -457,26 +492,26 @@ def get_pet_index(name, pets):
             return pets.index(i)    
 
 def new_pet():
-    print_cool("You got a new pig!")
+    print("You got a new pig!")
     sleep(0.5)
     name = input_cool("What would you like to name your pig? ")
-    print_cool(f"You now have a new pig named {name}!")
+    print(f"You now have a new pig named {name}!")
     return Pet(name)
 
 def start():
-    print_cool("Welcome to Pakistans Slave Labor Simulator!")
+    print("Welcome to Pakistans Slave Labor Simulator!")
     sleep(1)
-    print_cool("I mean, welcome to Pakistans Pig Farm Simulator!")
+    print("I mean, welcome to Pakistans Pig Farm Simulator!")
     sleep(0.5)
-    print_cool("Of course")
+    print("Of course")
     sleep(0.5)
-    print_cool("...", 0.5)
+    print("...", 0.5)
     sleep(1)
-    print_cool("Anyway, lets get you started")
-    print_cool("I'm giving you this stater pig for free, but don't expect any more charity outta me")
-    print_cool("You know, like, inflation, or something")
-    print_cool("Make sure it doesn't die, and don't overwork it")
-    print_cool("Good luck, I guess")
+    print("Anyway, lets get you started")
+    print("I'm giving you this stater pig for free, but don't expect any more charity outta me")
+    print("You know, like, inflation, or something")
+    print("Make sure it doesn't die, and don't overwork it")
+    print("Good luck, I guess")
     sleep(2)
     return [new_pet()]
 
@@ -579,9 +614,9 @@ def loadData():
                 outMoney = jsonData["money"]
                 outAuto = jsonData["automation"]
         except json.JSONDecodeError:
-            outMoney = 34893492483243343
+            outMoney = 0
             outAuto = {
-                "autofeeder_active" : True,
+                "autofeeder_active" : False,
                 "autofeed_type" : "Basic Food",
                 "autowater_active" : False, 
                 "funinator_active" : False
@@ -597,6 +632,8 @@ else:
         file.write("")
     with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "w") as file:
         file.write("")
+
+money = 9999
 
 while True:
     pets, money, inventory, automation = menu(pets, money, inventory, shop, automation)
