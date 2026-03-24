@@ -16,6 +16,7 @@ class Pet:
         self.awake = True
         self.alive = True
         self.skill = 5
+        self.interacted = False
         
     def normalize_vars(self):
         if self.hunger > 100: self.hunger = 100
@@ -30,9 +31,17 @@ class Pet:
         if self.health < 0: self.health = 0
         
     def day_stat_change(self):
-        self.hunger -= 20
-        self.thirst -= 20
-        self.happiness -= 20
+        self.interacted = False
+        if self.awake: 
+            self.health += 10
+            self.hunger -= 10
+            self.thirst -= 10
+            self.happiness += 10
+        else: 
+            self.skill += randint(0,3)
+            self.hunger -= 20
+            self.thirst -= 20
+            self.happiness -= 20
 
         if self.hunger < 20: 
             self.health -= 10
@@ -42,17 +51,21 @@ class Pet:
             self.happiness -= 75
         if self.happiness < 20: self.health -= 5
 
-        if self.hunger > 95: self.happiness += 10
-        if self.thirst > 95: self.happiness += 10
+        if self.hunger > 95: 
+            self.happiness += 10
+            self.health += 10
+        if self.thirst > 95: 
+            self.happiness += 10
+            self.health += 10
 
         if self.health <= 0:
             self.alive = False
 
-        if self.energy <= 0:
-            self.send_to_bed()
-
         if not self.awake:
             self.awake = True
+
+        if self.energy <= 0:
+            self.send_to_bed()
 
         self.normalize_vars()
 
@@ -123,16 +136,16 @@ class Pet:
                 self.hunger += 50
             case "Super Food":
                 self.hunger = 100
-                self.energy += 15
+                self.energy += 30
             case "Wet Food":
                 self.hunger += 50
                 self.thirst += 50
             case "Medicinal Food":
                 self.hunger += 50
-                self.health += 15
+                self.health += 20
             case "Tasty Food":
                 self.hunger += 50
-                self.happiness += 15
+                self.happiness += 30
 
         itemToRemove = ""
         for i in inventory:
@@ -140,7 +153,7 @@ class Pet:
                 if not foods[food_type][1]: itemToRemove = i
                 break
 
-        inventory = removeItemFromInventorY(inventory, itemToRemove)
+        if not infinite: inventory = removeItemFromInventorY(inventory, itemToRemove)
         print(f"Fed {self.name} {food_type}")
         self.normalize_vars()
 
@@ -221,6 +234,7 @@ class Pet:
                 case '5':
                     self.print_status()
                 case '6':
+                    self.interacted = True
                     break
 
 class Inv_Item:
@@ -375,15 +389,16 @@ def day(pets, inventory, money, shop, automation):
                     validPets = []
                     print(" ")
                     for i in pets: 
-                        print(i.basic_print())
-                        if i.alive and i.awake:
+                        
+                        if i.alive and i.awake and not i.interacted:
                             validPets.append(i)
+                            print(i.basic_print())
 
                     if not bool(validPets): break
 
                     currentPet = 0
                     while True:
-                        pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(pets))
+                        pet = idiot_proof_specific("What pet would you like to interact with? ", get_pet_names(validPets))
                         print(" ")
                         if pets[get_pet_index(pet, pets)].awake and pets[get_pet_index(pet, pets)].alive:
                             currentPet = get_pet_index(pet, pets)
@@ -391,6 +406,7 @@ def day(pets, inventory, money, shop, automation):
                         else:
                             if not pets[get_pet_index(pet, pets)].alive: print("That pet is dead")
                             elif not pets[get_pet_index(pet, pets)].awake: print("That pet is sleeping")
+                            elif pets[get_pet_index(pet, pets)].interacted: print("You already interacted with that pet today")
                     pets[currentPet].print_status()
                     pets[currentPet].interaction_options(inventory)
                     if not idiot_proof_yes_no("Would you like to interact with another pet? "): 
@@ -407,14 +423,19 @@ def day(pets, inventory, money, shop, automation):
             case 6:
                 print("Your pigs are digging for truffles")
                 money += getMone(pets)
-                saveData(pets, inventory, automation, money)
                 for i in pets: 
-                    if i.alive: i.age += 1
+                    if i.alive: 
+                        i.age += 1
+                        i.energy -= 20
+                saveData(pets, inventory, automation, money)          
                 return pets, money, inventory, automation          
             case 7:
-                saveData(pets, inventory, automation, money)
                 for i in pets: 
-                    if i.alive: i.age += 1
+                    if i.alive: 
+                        i.age += 1
+                        i.energy += 30
+                        i.happiness += 25
+                saveData(pets, inventory, automation, money)             
                 return pets, money, inventory, automation
 
 
@@ -505,7 +526,7 @@ def start():
     sleep(0.5)
     print("Of course")
     sleep(0.5)
-    print("...", 0.5)
+    print_cool("...",0.5)
     sleep(1)
     print("Anyway, lets get you started")
     print("I'm giving you this stater pig for free, but don't expect any more charity outta me")
@@ -633,7 +654,7 @@ else:
     with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "w") as file:
         file.write("")
 
-money = 9999
+money = 0
 
 while True:
     pets, money, inventory, automation = menu(pets, money, inventory, shop, automation)

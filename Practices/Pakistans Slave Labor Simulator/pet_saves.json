@@ -1,14 +1,28 @@
 [
     {
         "name": "1",
-        "age": 12,
-        "hunger": 95,
-        "thirst": 95,
-        "health": 70,
+        "age": 14,
+        "hunger": 90,
+        "thirst": 90,
+        "health": 40,
         "happiness": 100,
-        "energy": 0,
+        "energy": 80,
+        "awake": false,
+        "alive": true,
+        "skill": 5,
+        "interacted": false
+    },
+    {
+        "name": "2",
+        "age": 3,
+        "hunger": 90,
+        "thirst": 90,
+        "health": 100,
+        "happiness": 100,
+        "energy": 40,
         "awake": true,
         "alive": true,
-        "skill": 5
+        "skill": 5,
+        "interacted": false
     }
 ]
