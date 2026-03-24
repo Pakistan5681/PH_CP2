@@ -117,9 +117,13 @@ class Pet:
         foodIndex = {}
         for i in inventory:
             if i.type == "feed":
-                print(f"You have {i.name} ({current})")
+                print(f"{current}. You have {i.name} (remaining: {i.amount})")
                 foodIndex[str(current)] = i.name
                 current += 1
+
+        if not bool(list(foodIndex.keys())): 
+            print("You have no food goober")
+            return
 
         while True:
             print(" ")
@@ -378,7 +382,7 @@ def day(pets, inventory, money, shop, automation):
         print("2. Go to market")
         print("3. Look at inventory")
         print("4. Use an item")
-        print("5. Configure automation")
+        print("5. Configure Auto-feeder")
         print("6. Send pigs to work and end the day")
         print("7. End the day without working the pigs")
         print(" ")
@@ -394,7 +398,9 @@ def day(pets, inventory, money, shop, automation):
                             validPets.append(i)
                             print(i.basic_print())
 
-                    if not bool(validPets): break
+                    if not bool(validPets): 
+                        print("You can't interact with any pets right now")
+                        break
 
                     currentPet = 0
                     while True:
@@ -410,6 +416,7 @@ def day(pets, inventory, money, shop, automation):
                     pets[currentPet].print_status()
                     pets[currentPet].interaction_options(inventory)
                     if not idiot_proof_yes_no("Would you like to interact with another pet? "): 
+                        print("You can't interact with any pets right now")
                         print(" ")
                         break
             case 2:
@@ -419,7 +426,7 @@ def day(pets, inventory, money, shop, automation):
             case 4:
                 inventory, pets, automation = useItem(inventory, pets, automation)
             case 5:
-                pass
+                automation = AutofeedConfig(automation)
             case 6:
                 print("Your pigs are digging for truffles")
                 money += getMone(pets)
@@ -438,6 +445,26 @@ def day(pets, inventory, money, shop, automation):
                 saveData(pets, inventory, automation, money)             
                 return pets, money, inventory, automation
 
+
+def AutofeedConfig(automation):
+    if automation["autofeeder_active"]:
+        print("1. Basic Food")
+        print("2. Super Food")
+        print("3. Wet Food")
+        print("4. Medicinal Food")
+        print("5. Tasty Food")
+        option = idiot_proof_num_range(f"What food would you like to switch to (current food: {automation["autofeed_type"]})", 1, 5)
+
+        match option:
+            case 1: automation["autofeed_type"] = "Basic Food"
+            case 2: automation["autofeed_type"] = "Super Food"
+            case 3: automation["autofeed_type"] = "Wet Food"
+            case 4: automation["autofeed_type"] = "Medicinal Food"
+            case 5: automation["autofeed_type"] = "Tasty Food"
+    else:
+        print("You dont have an autofeeder. Buy one at the shop and remember to activate it.")
+
+    return automation
 
 def useItem(inventory, pets, automation):
     useable = False
