@@ -251,35 +251,6 @@ class Inv_Item:
     def __str__(self):
         return f"{self.name}: ${self.shop_price}"
 
-shop = [
-    Inv_Item("Basic Food", 1, "feed", 5),
-    Inv_Item("Super Food", 1, "feed", 10),
-    Inv_Item("Wet Food", 1, "feed", 7),
-    Inv_Item("Medicinal Food", 1, "feed", 12),
-    Inv_Item("Tasty Food", 1, "feed", 8),
-    Inv_Item("Infinite Basic Food", 1, "feed", 500),
-    Inv_Item("Infinite Super Food", 1, "feed", 1500),
-    Inv_Item("Infinite Wet Food", 1, "feed", 750),
-    Inv_Item("Infinite Medicinal Food", 1, "feed", 2000),
-    Inv_Item("Infinite Tasty Food", 1, "feed", 1250),
-    Inv_Item("Auto-feeder", 1, "consumable", 300),
-    Inv_Item("Advanced Auto-feeder", 1, "consumable", 750),
-    Inv_Item("Auto-water", 1, "consumable", 250),
-    Inv_Item("The Funinator", 1, "consumable", 425),
-    Inv_Item("Pig Egg", 1, "consumable", 100)
-]
-
-automation = {
-    "autofeeder_active" : False,
-    "autofeed_type" : "Basic Food",
-    "autowater_active" : False, 
-    "funinator_active" : False
-}
-                
-pets = []
-inventory = [Inv_Item("Basic Food", 5, "feed", 5)]
-money = 0
-
 def menu(pets, money, inventory, shop, automation):
     if bool(pets):
         pets, money, inventory, automation = day(pets, inventory, money, shop, automation)
@@ -680,7 +651,35 @@ else:
         file.write("")
     with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "w") as file:
         file.write("")
+
 def main():
+    shop = [
+    Inv_Item("Basic Food", 1, "feed", 5),
+    Inv_Item("Super Food", 1, "feed", 10),
+    Inv_Item("Wet Food", 1, "feed", 7),
+    Inv_Item("Medicinal Food", 1, "feed", 12),
+    Inv_Item("Tasty Food", 1, "feed", 8),
+    Inv_Item("Infinite Basic Food", 1, "feed", 500),
+    Inv_Item("Infinite Super Food", 1, "feed", 1500),
+    Inv_Item("Infinite Wet Food", 1, "feed", 750),
+    Inv_Item("Infinite Medicinal Food", 1, "feed", 2000),
+    Inv_Item("Infinite Tasty Food", 1, "feed", 1250),
+    Inv_Item("Auto-feeder", 1, "consumable", 300),
+    Inv_Item("Advanced Auto-feeder", 1, "consumable", 750),
+    Inv_Item("Auto-water", 1, "consumable", 250),
+    Inv_Item("The Funinator", 1, "consumable", 425),
+    Inv_Item("Pig Egg", 1, "consumable", 100)
+    ]
+
+    automation = {
+        "autofeeder_active" : False,
+        "autofeed_type" : "Basic Food",
+        "autowater_active" : False, 
+        "funinator_active" : False
+    }
+
+    pets = []
+    inventory = [Inv_Item("Basic Food", 5, "feed", 5)]
     money = 0
 
     if not idiot_proof_yes_no("Would you like to delete your old save and start fresh? "): pets, inventory, money, automation = loadData()
