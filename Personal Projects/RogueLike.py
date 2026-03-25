@@ -261,7 +261,7 @@ while running:
     direction = direction.normalize() * bulletSpeed   
     
     if keys[py.K_SPACE] and not reloading:
-        bullets.append(Bullet(playerX + 50, playerY + 50, py.Rect(playerX + 50, playerY + 50), direction.x, direction.y))
+        bullets.append(Bullet(playerX + 50, playerY + 50, py.Rect(playerX, playerY, 20, 20), direction.x, direction.y, bulletPierce))
         reloading = True
         reloadClock = 0
 
@@ -275,15 +275,9 @@ while running:
     fullnew = []
     bulletColliders = []
     for i in bullets:
-        new = [round(i[0] + i[2]), round(i[1] + i[3]), i[2], i[3]]
-        py.draw.ellipse(screen, BLACK, (new[0], new[1], 20, 20))   
+        new = Bullet(round(i.x + i.velX), round(i.y+ i.velY), py.Rect(i.x, i.y, 20, 20), i.velX, i.velY, bulletPierce)
+        py.draw.ellipse(screen, BLACK, (new.x, new.y, 20, 20))   
         fullnew.append(new)
-        bulletColliders.append(py.Rect(
-                    new[0],
-                    new[1],
-                    50,
-                    50
-                ))
 
     bullets = fullnew
 
@@ -335,16 +329,16 @@ while running:
         regfoes = fullnew
 
     # Checks for bullet-enemy collisions
-    for i in bulletColliders:
+    for i in bullets:
         for j in regfoes:
-            if j.collider.colliderect(i):
+            if j.collider.colliderect(i.collider):
                 enemy = j
                 proj = i
 
                 regfoes.remove(j)
 
                 for k in bullets:
-                    if k[0] == proj.x and k[1] == proj.y:
+                    if k.x == proj.x and k.y == proj.y:
                         bullets.remove(k)
 
                 xp += knowledge
