@@ -680,8 +680,17 @@ else:
         file.write("")
     with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "w") as file:
         file.write("")
+def main():
+    money = 0
 
-money = 0
+    if not idiot_proof_yes_no("Would you like to delete your old save and start fresh? "): pets, inventory, money, automation = loadData()
+    else:
+        with open("Practices/Pakistans Slave Labor Simulator/pet_saves.json", "w") as file:
+            file.write("")
+        with open("Practices/Pakistans Slave Labor Simulator/inventory_saves.json", "w") as file:
+            file.write("")
+        with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "w") as file:
+            file.write("")
 
-while True:
-    pets, money, inventory, automation = menu(pets, money, inventory, shop, automation)
+    while True:
+        pets, money, inventory, automation = menu(pets, money, inventory, shop, automation)

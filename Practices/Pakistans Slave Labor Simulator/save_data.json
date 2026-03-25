@@ -1,9 +1,0 @@
-{
-    "money": 138,
-    "automation": {
-        "autofeeder_active": true,
-        "autofeed_type": "Super Food",
-        "autowater_active": false,
-        "funinator_active": false
-    }
-}
