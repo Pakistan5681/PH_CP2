@@ -14,8 +14,13 @@ class All_Students:
         for i in self.students: i.print_self()
 
     def new_grade(self):
-        for i in self.students: i.basic_print()
+        studentIDRef = {}
+        for i in self.students: 
+            i.basic_print()
+            studentIDRef[i.stuID] = i
 
+        newID = pf.idiot_proof_specific("What student do you want to change the grade of (enter ID) ", list(studentIDRef.keys()))
+        stu
 
 class Student:
     def __init__(self, name, stuID, classes):
@@ -44,8 +49,22 @@ class Student:
         elif self.grade >= 60: return "D-"
         else: return "F"
 
-    def add_grade(self, grade):
-        self.classes.append(grade)
+    def change_grade(self):
+        classNameRef = {}
+        for i in self.classes: 
+            classNameRef[i.name] = i
+            print(f"{i.name} (grade: {i.grade}%)")
+
+        print(" ")
+        if bool(self.classes):
+            classToChange = pf.idiot_proof_specific("What classes grade do you want to change? ", list(classNameRef.keys()))
+            newGrade = pf.idiot_proof_num_range(f"What grade would you like to set for {classToChange}? ", 0, 100)
+
+            self.classes.remove(classNameRef[classToChange])
+            self.classes.append(Class_Grade(newGrade, classToChange))
+
+    def new_grade(self):
+        newClass = input("What class do you want to add? ")
 
     def print_self(self):
         print(f"|{self.name}|{self.stuID}|{self.calc_average()}|{self.get_letter_grade(self.calc_average())}|")
@@ -55,9 +74,9 @@ class Student:
 
 
 class Class_Grade:
-    def __init__(self, grade, className):
+    def __init__(self, grade, name):
         self.grade = grade
-        self.className = className      
+        self.name = name      
 
 def main():
     while True:
