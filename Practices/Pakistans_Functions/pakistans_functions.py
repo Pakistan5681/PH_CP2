@@ -1,5 +1,6 @@
+from time import sleep
 
-# Lines 3 - 14 contain ansi codes to color terminal text
+# Lines 4 - 15 contain ansi codes to color terminal text
 BOLD = "\033[1m"
 CLEAR = "\033[0m"
 UNDERLINE = "\033[4m"
@@ -181,3 +182,42 @@ def insert_string(string, string_to_insert, index):
 def float_to_int(num_float):
     num_float = round(num_float, 0)
     return int(num_float)
+
+def print_cool(statement, delay=0.025):
+    """
+    Like a normal print statement, but displays characters one at a time with a short interval.
+
+    The statement currently doesn't support lists of any type
+
+    Time between characters can be specified
+    """
+
+    if isinstance(statement, float) or isinstance(statement, int) or isinstance(statement, bool):
+        statement = str(statement)
+    elif not isinstance(statement, str):
+        raise Exception("The inputted data type is not supported.")
+
+    for i in statement:
+        print(i, end="")
+        sleep(delay)
+    print(" ")
+
+def input_cool(statement, delay=0.05):
+    """
+    Like a normal input statement, but displays characters one at a time with a short interval.
+
+    The statement currently doesn't support lists of any type
+
+    Time between characters can be specified
+    """
+
+    if isinstance(statement, float) or isinstance(statement, int) or isinstance(statement, bool):
+        statement = str(statement)
+    elif not isinstance(statement, str):
+        raise Exception("The inputted data type is not supported.")
+
+    for i in statement:
+        print(i, end="")
+        sleep(delay)
+    return input("")
+            

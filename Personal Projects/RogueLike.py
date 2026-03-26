@@ -10,13 +10,14 @@ class Upgrade:
         self.description = description
 
 class Enemy:
-    def __init__(self, x, y, collider, velX, velY, speed):
+    def __init__(self, x, y, collider, velX, velY, speed, health):
         self.x = x
         self.y = y
         self.collider = collider
         self.velX = velX
         self.velY = velY
         self.speed = speed
+        self.health = health
 
 class Bullet:
     def __init__(self, x, y, collider, velX, velY, pierce):
@@ -109,7 +110,7 @@ reloadTime = 15
 # Bullets
 bullets = []
 bulletSpeed = 10
-bulletPierce = 1
+bulletPierce = 2
 
 # Enemies
 regfoes = []
@@ -166,11 +167,11 @@ def get_foe_pos(): # For spawning enemies; spawns an enemy outside of the screen
 
     return out
 
-def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge): # Runs all logic for upgrading the player
+def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce): # Runs all logic for upgrading the player
     global potUpgrades
     global running
 
-    def applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, stat, amount): # Actually applies the upgrades
+    def applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce, stat, amount): # Actually applies the upgrades
         match stat:
             case "Max Health":
                 maxHealth += amount
@@ -185,8 +186,10 @@ def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpe
                 bulletSpeed += amount
             case "Knowledge":
                 knowledge += amount
+            case "Pierce":
+                pierce += amount
 
-        return playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge
+        return playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce
 
     # Setup
     upgrades = []
@@ -217,11 +220,11 @@ def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpe
         for event in py.event.get():
             if event.type == py.MOUSEBUTTONDOWN:
                 if rects[0].collidepoint(event.pos):
-                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, upgrades[0].stat, upgrades[0].amount)
+                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce, upgrades[0].stat, upgrades[0].amount)
                 elif rects[1].collidepoint(event.pos):
-                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, upgrades[1].stat, upgrades[1].amount)
+                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce, upgrades[1].stat, upgrades[1].amount)
                 elif rects[2].collidepoint(event.pos):
-                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, upgrades[2].stat, upgrades[2].amount)
+                    return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce, upgrades[2].stat, upgrades[2].amount)
             elif event.type == py.QUIT:
                 running = False 
 
@@ -285,7 +288,7 @@ while running:
     regSpawnClock += 1
     if regSpawnClock >= regSpawnTime:
         pos = get_foe_pos()
-        regfoes.append(Enemy(pos[0], pos[1], py.Rect(pos[0], pos[1], 50, 50), 0, 0, 2))
+        regfoes.append(Enemy(pos[0], pos[1], py.Rect(pos[0], pos[1], 50, 50), 0, 0, 2, 2))
         regSpawnClock = 0 
  
     fullnew = [] 
@@ -339,8 +342,13 @@ while running:
 
                 for k in bullets:
                     if k.x == proj.x and k.y == proj.y:
-                        bullets.remove(k)
-
+                        if k.pierce > 1:
+                            bullets.remove(k)
+                            proj.pierce -= 1
+                            bullets.append(proj)
+                        else:
+                            bullets.remove(k)
+                        
                 xp += knowledge
     # Draws the healthbar
     for i in range(maxHealth):
@@ -371,11 +379,13 @@ while running:
     if xp >= upgradeReq:
         xp = 0
         upgradeReq = round(upgradeReq * 1.25)
-        playerSpeed, health, maxHealth, reloadTime, bulletSpeed, knowledge = LevelUpOptions(playerSpeed, health, maxHealth, reloadTime, bulletSpeed, knowledge)
+        playerSpeed, health, maxHealth, reloadTime, bulletSpeed, knowledge, bulletPierce = LevelUpOptions(playerSpeed, health, maxHealth, reloadTime, bulletSpeed, knowledge, bulletPierce)
 
     # kills the player
     if health <= 0:
         running = False
+
+    print(bulletPierce)
 
     py.draw.ellipse(screen, WHITE, (playerX, playerY, 100, 100))
     if running: py.display.flip()
