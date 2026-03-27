@@ -1,4 +1,6 @@
 from Pakistans_Functions import pakistans_functions as pf
+import os
+import json
 
 class All_Students:
     def __init__(self, students):
@@ -6,13 +8,39 @@ class All_Students:
 
     def add_student(self):
         name = input("What is the name of the new student? ")
-        studentID = pf.idiot_proof_num_range("What is the students ID? ", 10000, 99999, "integer", "The ID must be 5-digit code")
+
+        ids = []
+        for i in self.students: ids.append(i.stuID)
+
+        while True:
+            studentID = pf.idiot_proof_num_range("What is the students ID? ", 10000, 99999, "integer", "The ID must be 5-digit code")
+            if studentID in ids: print("You already have a student with that ID")
+            else: break
+
         self.students.append(Student(name, studentID, []))
 
     def print_students(self):
         print("| Name | ID | Avg | Grade |")
         for i in self.students: i.print_self()
 
+    def print_specific_student(self):
+        studentNameRef = {}
+        for i in self.students:
+            i.basic_print()
+            studentNameRef[i.name] = i
+        
+        student = studentNameRef[pf.idiot_proof_specific("What student do you want examine? ", list(studentNameRef.keys()))]
+        student.print_self()
+
+    def change_grade(self):
+        studentIDRef = {}
+        for i in self.students: 
+            i.basic_print()
+            studentIDRef[i.stuID] = i
+
+        newID = pf.idiot_proof_specific("What student do you want to change the grade of (enter ID) ", list(studentIDRef.keys()))
+        studentIDRef[newID].change_grade()
+    
     def new_grade(self):
         studentIDRef = {}
         for i in self.students: 
@@ -20,7 +48,31 @@ class All_Students:
             studentIDRef[i.stuID] = i
 
         newID = pf.idiot_proof_specific("What student do you want to change the grade of (enter ID) ", list(studentIDRef.keys()))
-        stu
+        studentIDRef[newID].new_grade()
+
+    def yoink_summary(self):
+        totalGrade = 0
+        for i in self.students:
+            totalGrade += i.calc_average()
+
+        grade = totalGrade / len(self.students)
+        print(f"Average class grade: {grade} ({self.get_letter_grade(grade)})")
+
+
+    def get_letter_grade(self, num):
+        if self.grade >= 94: return "A"
+        elif self.grade >= 90: return "A-"
+        elif self.grade >= 87: return "B+"
+        elif self.grade >= 83: return "B"
+        elif self.grade >= 80: return "B-"
+        elif self.grade >= 77: return "C+"
+        elif self.grade >= 73: return "C"
+        elif self.grade >= 70: return "C-"
+        elif self.grade >= 67: return "D+"
+        elif self.grade >= 63: return "D"
+        elif self.grade >= 60: return "D-"
+        else: return "F"
+
 
 class Student:
     def __init__(self, name, stuID, classes):
@@ -65,6 +117,10 @@ class Student:
 
     def new_grade(self):
         newClass = input("What class do you want to add? ")
+        newGrade = pf.idiot_proof_num_range("What grade do you want in this class? ", 0, 100)
+
+        self.classes.append(Class_Grade(newGrade, newClass))
+
 
     def print_self(self):
         print(f"|{self.name}|{self.stuID}|{self.calc_average()}|{self.get_letter_grade(self.calc_average())}|")
@@ -78,11 +134,46 @@ class Class_Grade:
         self.grade = grade
         self.name = name      
 
-def main():
-    while True:
-        menu()
-
 def menu():
-    pass
+    while True:
+        daClass = All_Students([])
 
+        print("1. Add new student")
+        print("2. Add grade to student")
+        print("3. Change student grade")
+        print("4. View student record")
+        print("5. View all students")
+        print("6. Class summary")
+        print("7. Exit")
+        print(" ")
+        option = pf.idiot_proof_num_range("Type the number of the desired option: ", 1, 6)
+
+        match option:
+            case 1: daClass.add_student()
+            case 2: daClass.new_grade()
+            case 3: daClass.change_grade()
+            case 4: daClass.print_specific_student()
+            case 5: daClass.print_students()
+            case 6: daClass.yoink_summary()
+            case 7: break
+
+def save(students):
+    if os.path.isfile("Practices/Pakistans Slave Labor Simulator/save_data.json"):
+        with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "w") as file:
+            studentsRaw = []
+            for i in students:
+                classes = []
+                for i in classes:
+                    classes.append(i.__dict__)
+
+                studentDict = {
+                    "name": i.name,
+                    "id": i.stuID,
+                    "classes" : classes
+                }
+
+                studentsRaw.append(studentDict)
+    
+
+menu()
 

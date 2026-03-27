@@ -1,0 +1,8 @@
+[
+    {
+        "name": "Basic Food",
+        "amount": 4,
+        "type": "feed",
+        "shop_price": 5
+    }
+]

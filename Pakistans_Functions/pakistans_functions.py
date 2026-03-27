@@ -202,7 +202,7 @@ def print_cool(statement, delay=0.025):
         sleep(delay)
     print(" ")
 
-def input_cool(statement, delay=0.05):
+def input_cool(statement, delay=0.025):
     """
     Like a normal input statement, but displays characters one at a time with a short interval.
 
