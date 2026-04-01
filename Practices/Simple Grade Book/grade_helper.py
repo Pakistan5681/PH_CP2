@@ -29,14 +29,14 @@ class All_Students:
             i.basic_print()
             studentNameRef[i.name] = i
         
-        student = studentNameRef[pf.idiot_proof_specific("What student do you want examine? ", list(studentNameRef.keys()))]
+        student = studentNameRef[pf.idiot_proof_specific("What student do you want examine (Enter Name)? ", list(studentNameRef.keys()))]
         student.print_self()
 
     def change_grade(self):
         studentIDRef = {}
         for i in self.students: 
             i.basic_print()
-            studentIDRef[i.stuID] = i
+            studentIDRef[str(i.stuID)] = i
 
         newID = pf.idiot_proof_specific("What student do you want to change the grade of (enter ID) ", list(studentIDRef.keys()))
         studentIDRef[newID].change_grade()
@@ -45,7 +45,7 @@ class All_Students:
         studentIDRef = {}
         for i in self.students: 
             i.basic_print()
-            studentIDRef[i.stuID] = i
+            studentIDRef[str(i.stuID)] = i
 
         newID = pf.idiot_proof_specific("What student do you want to change the grade of (enter ID) ", list(studentIDRef.keys()))
         studentIDRef[newID].new_grade()
@@ -85,9 +85,10 @@ class Student:
         for i in self.classes:
             totalGrade += i.grade
 
-        return totalGrade / len(self.classes)
+        if totalGrade != 0: return totalGrade / len(self.classes)
+        else: return "Not enrolled in any classes"
     
-    def get_letter_grade(self):
+    def get_letter_grade(self, grade):
         if self.grade >= 94: return "A"
         elif self.grade >= 90: return "A-"
         elif self.grade >= 87: return "B+"
@@ -123,7 +124,7 @@ class Student:
 
 
     def print_self(self):
-        print(f"|{self.name}|{self.stuID}|{self.calc_average()}|{self.get_letter_grade(self.calc_average())}|")
+        print(f"|{self.name}|{self.stuID}|{self.calc_average()}|{self.get_letter_grade()}|")
 
     def basic_print(self):
         print(f"{self.name} (ID: {self.stuID})")
@@ -135,9 +136,9 @@ class Class_Grade:
         self.name = name      
 
 def menu():
-    while True:
-        daClass = All_Students([])
+    daClass = load()
 
+    while True:
         print("1. Add new student")
         print("2. Add grade to student")
         print("3. Change student grade")
@@ -157,9 +158,11 @@ def menu():
             case 6: daClass.yoink_summary()
             case 7: break
 
+        save(daClass.students)
+
 def save(students):
-    if os.path.isfile("Practices/Pakistans Slave Labor Simulator/save_data.json"):
-        with open("Practices/Pakistans Slave Labor Simulator/save_data.json", "w") as file:
+    if os.path.isfile("Practices/Simple Grade Book/saver.json"):
+        with open("Practices/Simple Grade Book/saver.json", "w") as file:
             studentsRaw = []
             for i in students:
                 classes = []
@@ -173,6 +176,30 @@ def save(students):
                 }
 
                 studentsRaw.append(studentDict)
+            json.dump(studentsRaw, file, indent=4)
+
+def load():
+    if os.path.isfile("Practices/Simple Grade Book/saver.json"):
+        allStudents = All_Students([])
+        try:
+            with open("Practices/Simple Grade Book/saver.json", "r") as jFile:
+                students = []
+                file = json.load(jFile)
+
+                for i in file:
+                    classes = []
+                    for c in i["classes"]:
+                        name = c["name"]
+                        grade = c["grade"]
+                        classes.append(Class_Grade(grade, name))
+
+                    students.append(Student(i["name"], i["id"], classes))
+                allStudents.students = students
+                return allStudents
+            
+        except json.JSONDecodeError:
+            return allStudents
+            
     
 
 menu()
