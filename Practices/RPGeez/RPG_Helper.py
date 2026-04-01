@@ -3,6 +3,8 @@ import faker as f
 import matplotlib as m
 import pandas as p
 from random import choice, randint
+import os
+import json
 
 class Character():
     def __init__(self, name, race, classType, weapon):
@@ -22,6 +24,25 @@ class Character():
 
     def __str__(self):
         return f"{self.name} ({self.race} {self.classType}), level {self.level}."
+    
+    def add_xp(self):
+        xp_cost = (2 ^ (self.level - 1)) * 100
+
+        while self.xp > xp_cost:
+            self.xp -= xp_cost
+            self.level_up()
+
+    def level_up(self):
+        print("1. Strength")
+        print("2. Dexterity")
+        print("3. Constitution")
+        print("4. Intelligence")
+        print("5. Wisdom")
+        print("6. Charisma")
+        option = pf.idiot_proof_num_range(f"{self.name} leveled up! Enter the numbered option of the stat you want to increase ")
+
+        match option:
+            case 1:
 
 class Inv_Item():
     def __init__(self, name, amount):
@@ -29,15 +50,21 @@ class Inv_Item():
         self.amount = amount
 
 def main():
+    characters = load()
     while True:
         print("1. Create Character")
         print("2. Create Random Character")
         print("3. Manage Character")
-        option = pf.idiot_proof_num_range("Select option", 1, 3)
+        print("4. Display Characters")
+        option = pf.idiot_proof_num_range("Select option ", 1, 4)
 
         match option:
-            case 1: create_character()
-            case 2: create_random()
+            case 1: characters.append(create_character())
+            case 2: characters.append(create_random())
+            case 3: pass
+            case 4: display_all(characters)
+
+        save(characters)
 
 def create_character():
     classes = ["Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"]
@@ -58,6 +85,7 @@ def create_character():
     return Character(name, race, classType, weapon)
 
 def create_random():
+    print(" ")
     classes = ["Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"]
     races = ["Dragonborn", "Dwarf", "Elf", "Gnome", "Half-Elf", "Half-Orc", "Halfling", "Human", "Tiefling"]
     starting_weapons = ["Club", "Dagger", "Greatclub", "Handaxe", "Javelin", "Light Hammer", "Mace", "Quarterstaff", "Sickle", "Spear", "Light Crossbow", "Dart", "Shortbow", "Sling"]
@@ -67,6 +95,46 @@ def create_random():
     clasS = choice(classes)
     weap = choice(starting_weapons)
 
+    print(f"Created {Character(name, race, clasS, weap)}")
+    print(" ")
     return Character(name, race, clasS, weap)
+
+def display_all(chars):
+    print(" ")
+    for i in chars:
+        print(i)
+    print(" ")
+
+def save(chars):
+    if os.path.isfile("Practices/RPGeez/char_saves.json"):
+        with open("Practices/RPGeez/char_saves.json", "w") as file:
+            saveChars = []
+            for i in chars:
+                saveChars.append(i.__dict__)
+            json.dump(saveChars, file)
+
+def load():
+    if os.path.isfile("Practices/RPGeez/char_saves.json"):
+            try:
+                with open("Practices/RPGeez/char_saves.json", "r") as file:
+                    jsonData = json.load(file)
+                    chars = []
+                    for i in jsonData:
+                        newChar = Character(i["name"], i["race"], i["classType"], i["weapon"])
+                        newChar.level = i["level"]
+                        newChar.inventory = i["inventory"]
+                        newChar.str = i["str"]
+                        newChar.dex = i["dex"]
+                        newChar.int = i["int"]
+                        newChar.const = i["const"]
+                        newChar.wis = i["wis"]
+                        newChar.char = i["char"]
+                        newChar.xp = i["xp"]
+
+                        chars.append(newChar)
+
+                    return chars
+            except json.JSONDecodeError:
+                return []
 
 main()
