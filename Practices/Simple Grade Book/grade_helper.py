@@ -30,7 +30,9 @@ class All_Students:
             studentNameRef[i.name] = i
         
         student = studentNameRef[pf.idiot_proof_specific("What student do you want examine (Enter Name)? ", list(studentNameRef.keys()))]
+        print(" ")
         student.print_self()
+        print(" ")
 
     def change_grade(self):
         studentIDRef = {}
@@ -53,24 +55,25 @@ class All_Students:
     def yoink_summary(self):
         totalGrade = 0
         for i in self.students:
-            totalGrade += i.calc_average()
+            if i.calc_average() != "Not enrolled in any classes": totalGrade += i.calc_average()
+            else: totalGrade += 100
 
         grade = totalGrade / len(self.students)
         print(f"Average class grade: {grade} ({self.get_letter_grade(grade)})")
 
 
     def get_letter_grade(self, num):
-        if self.grade >= 94: return "A"
-        elif self.grade >= 90: return "A-"
-        elif self.grade >= 87: return "B+"
-        elif self.grade >= 83: return "B"
-        elif self.grade >= 80: return "B-"
-        elif self.grade >= 77: return "C+"
-        elif self.grade >= 73: return "C"
-        elif self.grade >= 70: return "C-"
-        elif self.grade >= 67: return "D+"
-        elif self.grade >= 63: return "D"
-        elif self.grade >= 60: return "D-"
+        if num >= 94: return "A"
+        elif num >= 90: return "A-"
+        elif num >= 87: return "B+"
+        elif num >= 83: return "B"
+        elif num >= 80: return "B-"
+        elif num >= 77: return "C+"
+        elif num >= 73: return "C"
+        elif num >= 70: return "C-"
+        elif num >= 67: return "D+"
+        elif num >= 63: return "D"
+        elif num > 60: return "D-"
         else: return "F"
 
 
@@ -89,18 +92,20 @@ class Student:
         else: return "Not enrolled in any classes"
     
     def get_letter_grade(self, grade):
-        if self.grade >= 94: return "A"
-        elif self.grade >= 90: return "A-"
-        elif self.grade >= 87: return "B+"
-        elif self.grade >= 83: return "B"
-        elif self.grade >= 80: return "B-"
-        elif self.grade >= 77: return "C+"
-        elif self.grade >= 73: return "C"
-        elif self.grade >= 70: return "C-"
-        elif self.grade >= 67: return "D+"
-        elif self.grade >= 63: return "D"
-        elif self.grade >= 60: return "D-"
-        else: return "F"
+        if grade != "Not enrolled in any classes":
+            if grade >= 94: return "A"
+            elif grade >= 90: return "A-"
+            elif grade >= 87: return "B+"
+            elif grade >= 83: return "B"
+            elif grade >= 80: return "B-"
+            elif grade >= 77: return "C+"
+            elif grade >= 73: return "C"
+            elif grade >= 70: return "C-"
+            elif grade >= 67: return "D+"
+            elif grade >= 63: return "D"
+            elif grade >= 60: return "D-"
+            else: return "F"
+        else: return "Not enrolled in any classes"
 
     def change_grade(self):
         classNameRef = {}
@@ -124,7 +129,7 @@ class Student:
 
 
     def print_self(self):
-        print(f"|{self.name}|{self.stuID}|{self.calc_average()}|{self.get_letter_grade()}|")
+        print(f"|{self.name}|{self.stuID}|{self.calc_average()}|{self.get_letter_grade(self.calc_average())}|")
 
     def basic_print(self):
         print(f"{self.name} (ID: {self.stuID})")
@@ -147,7 +152,7 @@ def menu():
         print("6. Class summary")
         print("7. Exit")
         print(" ")
-        option = pf.idiot_proof_num_range("Type the number of the desired option: ", 1, 6)
+        option = pf.idiot_proof_num_range("Type the number of the desired option: ", 1, 7)
 
         match option:
             case 1: daClass.add_student()
@@ -166,8 +171,8 @@ def save(students):
             studentsRaw = []
             for i in students:
                 classes = []
-                for i in classes:
-                    classes.append(i.__dict__)
+                for j in i.classes:
+                    classes.append(j.__dict__)
 
                 studentDict = {
                     "name": i.name,
@@ -199,8 +204,6 @@ def load():
             
         except json.JSONDecodeError:
             return allStudents
-            
-    
 
 menu()
 
