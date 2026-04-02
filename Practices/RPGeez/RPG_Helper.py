@@ -1,6 +1,6 @@
 from Pakistans_Functions import pakistans_functions as pf
 import faker as f
-import matplotlib as m
+import matplotlib.pyplot as m
 import pandas as p
 from random import choice, randint
 import os
@@ -25,24 +25,61 @@ class Character():
     def __str__(self):
         return f"{self.name} ({self.race} {self.classType}), level {self.level}."
     
+    def print_stats(self):
+        print(self)
+        print(" ")
+        print(f"Strength: {self.str}, Dexterity: {self.dex}, Constitution: {self.const}")
+        print(f"Intelligence: {self.int}, Wisdom: {self.wis}, Charisma: {self.char}")
+        print(" ")
+    
     def add_xp(self):
-        xp_cost = (2 ^ (self.level - 1)) * 100
+        if self.level:
+            xp_cost = (2 ** (self.level - 1)) * 100
 
-        while self.xp > xp_cost:
-            self.xp -= xp_cost
-            self.level_up()
+            xp_to_add = abs(pf.idiot_proof_general("How much xp do you want to add? "))
+            self.xp += xp_to_add
+
+            if self.xp >= xp_cost:
+                while self.xp >= xp_cost and self.level:
+                    self.xp -= xp_cost
+                    xp_cost = (2 ** (self.level - 1)) * 100
+                    self.level_up()
+            else:
+                print(f"Added {xp_to_add} xp! ({self.xp} / {xp_cost})")
+                print(" ")
+        else:
+            print(f"{self.name} is already max level")
 
     def level_up(self):
+        self.level += 1
+        print(f"{pf.YELLOWTEXT}{self.name} levelled up to level {pf.UNDERLINE}{self.level}{pf.RESET}")
         print("1. Strength")
         print("2. Dexterity")
         print("3. Constitution")
         print("4. Intelligence")
         print("5. Wisdom")
         print("6. Charisma")
-        option = pf.idiot_proof_num_range(f"{self.name} leveled up! Enter the numbered option of the stat you want to increase ")
+        print(" ")
+        option = pf.idiot_proof_num_range("Enter the numbered option of the stat you want to increase ", 1, 6)
+        print(" ")
+        self.print_stats()
+        print(" ")
 
         match option:
-            case 1:
+            case 1: self.str += 1 
+            case 2: self.dex += 1 
+            case 3: self.const += 1 
+            case 4: self.int += 1 
+            case 5: self.wis += 1 
+            case 6: self.char += 1 
+
+    def display_stat_chart(self):
+        stats = [self.str, self.dex, self.const, self.int, self.wis, self.char]
+        labels = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"]
+
+        m.pie(stats, labels=labels)
+        m.title(f"{self.name}'s Stats (Lvl. {self.level})")
+        m.show()
 
 class Inv_Item():
     def __init__(self, name, amount):
@@ -51,20 +88,57 @@ class Inv_Item():
 
 def main():
     characters = load()
-    while True:
+    print(" ")
+
+    while True:      
         print("1. Create Character")
         print("2. Create Random Character")
         print("3. Manage Character")
         print("4. Display Characters")
-        option = pf.idiot_proof_num_range("Select option ", 1, 4)
+        print("5. Visualize Character Stats")
+        option = pf.idiot_proof_num_range("Select option ", 1, 5)
 
         match option:
             case 1: characters.append(create_character())
             case 2: characters.append(create_random())
-            case 3: pass
+            case 3: manage_character(characters)
             case 4: display_all(characters)
+            case 5: display_stats_visual(characters)
 
         save(characters)
+
+def manage_character(characters):
+    starting_weapons = ["Club", "Dagger", "Greatclub", "Handaxe", "Javelin", "Light Hammer", "Mace", "Quarterstaff", "Sickle", "Spear", "Light Crossbow", "Dart", "Shortbow", "Sling"]
+
+    print(" ")
+    charNameRef = {}
+    for i in characters: 
+        charNameRef[i.name] = i
+        print(i)
+    print(" ")
+    character = charNameRef[pf.idiot_proof_specific("What character do you want to change? ", list(charNameRef.keys()))]
+
+    print("1. Add xp")
+    print("2. Change weapon")
+    print("3. Change name")
+    option = pf.idiot_proof_num_range("Select numbered option: ", 1, 3)
+    print(" ")
+
+    match option:
+        case 1: character.add_xp()
+        case 2:
+            print(f"{starting_weapons[0]}, {starting_weapons[1]}, {starting_weapons[2]}")
+            print(f"{starting_weapons[3]}, {starting_weapons[4]}, {starting_weapons[5]}")
+            print(f"{starting_weapons[6]}, {starting_weapons[7]}, {starting_weapons[8]}")
+            print(f"{starting_weapons[9]}, {starting_weapons[10]}, {starting_weapons[11]}")
+            print(f"{starting_weapons[12]}, {starting_weapons[13]}")
+
+            weapon = pf.idiot_proof_specific("Which of these weapons do you want to change to? ", starting_weapons)
+            character.weapon = weapon
+        case 3:
+            name = input("What name do you want to give your character? ")
+            character.name = name
+
 
 def create_character():
     classes = ["Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"]
@@ -75,11 +149,13 @@ def create_character():
     race = pf.idiot_proof_specific("what race is your character? ", races)
     classType = pf.idiot_proof_specific("what class is your character? ", classes)
 
+    print(" ")
     print(f"{starting_weapons[0]}, {starting_weapons[1]}, {starting_weapons[2]}")
     print(f"{starting_weapons[3]}, {starting_weapons[4]}, {starting_weapons[5]}")
     print(f"{starting_weapons[6]}, {starting_weapons[7]}, {starting_weapons[8]}")
     print(f"{starting_weapons[9]}, {starting_weapons[10]}, {starting_weapons[11]}")
     print(f"{starting_weapons[12]}, {starting_weapons[13]}")
+    print(" ")
 
     weapon = pf.idiot_proof_specific("Which of these weapons do you want to start with? ", starting_weapons)
     return Character(name, race, classType, weapon)
@@ -90,7 +166,7 @@ def create_random():
     races = ["Dragonborn", "Dwarf", "Elf", "Gnome", "Half-Elf", "Half-Orc", "Halfling", "Human", "Tiefling"]
     starting_weapons = ["Club", "Dagger", "Greatclub", "Handaxe", "Javelin", "Light Hammer", "Mace", "Quarterstaff", "Sickle", "Spear", "Light Crossbow", "Dart", "Shortbow", "Sling"]
     fake = f.Faker()
-    name = fake.name()
+    name = fake.first_name()
     race = choice(races)
     clasS = choice(classes)
     weap = choice(starting_weapons)
@@ -98,6 +174,18 @@ def create_random():
     print(f"Created {Character(name, race, clasS, weap)}")
     print(" ")
     return Character(name, race, clasS, weap)
+
+def display_stats_visual(characters):
+    print(" ")
+    charNameRef = {}
+    for i in characters: 
+        charNameRef[i.name] = i
+        print(i)
+    print(" ")
+    character = charNameRef[pf.idiot_proof_specific("What character do you want to change? ", list(charNameRef.keys()))]
+
+    character.display_stat_chart()
+
 
 def display_all(chars):
     print(" ")
@@ -111,7 +199,7 @@ def save(chars):
             saveChars = []
             for i in chars:
                 saveChars.append(i.__dict__)
-            json.dump(saveChars, file)
+            json.dump(saveChars, file, indent=4)
 
 def load():
     if os.path.isfile("Practices/RPGeez/char_saves.json"):
