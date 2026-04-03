@@ -96,7 +96,8 @@ def main():
         print("3. Manage Character")
         print("4. Display Characters")
         print("5. Visualize Character Stats")
-        option = pf.idiot_proof_num_range("Select option ", 1, 5)
+        print("6. Character Comparison")
+        option = pf.idiot_proof_num_range("Select option ", 1, 6)
 
         match option:
             case 1: characters.append(create_character())
@@ -104,6 +105,7 @@ def main():
             case 3: manage_character(characters)
             case 4: display_all(characters)
             case 5: display_stats_visual(characters)
+            case 6: character_comparison(characters)
 
         save(characters)
 
@@ -158,7 +160,16 @@ def create_character():
     print(" ")
 
     weapon = pf.idiot_proof_specific("Which of these weapons do you want to start with? ", starting_weapons)
-    return Character(name, race, classType, weapon)
+
+    new = Character(name, race, classType, weapon)
+    new.str = randint(5, 15)
+    new.dex = randint(5, 15)
+    new.const = randint(5, 15)
+    new.int = randint(5, 15)
+    new.wis = randint(5, 15)
+    new.char = randint(5, 15)
+
+    return new
 
 def create_random():
     print(" ")
@@ -170,12 +181,21 @@ def create_random():
     race = choice(races)
     clasS = choice(classes)
     weap = choice(starting_weapons)
+    new = Character(name, race, clasS, weap)
 
-    print(f"Created {Character(name, race, clasS, weap)}")
+    new.str = randint(5, 15)
+    new.dex = randint(5, 15)
+    new.const = randint(5, 15)
+    new.int = randint(5, 15)
+    new.wis = randint(5, 15)
+    new.char = randint(5, 15)
+
+    print(f"Created {new}")
     print(" ")
-    return Character(name, race, clasS, weap)
+    return new
 
 def display_stats_visual(characters):
+
     print(" ")
     charNameRef = {}
     for i in characters: 
@@ -185,6 +205,103 @@ def display_stats_visual(characters):
     character = charNameRef[pf.idiot_proof_specific("What character do you want to change? ", list(charNameRef.keys()))]
 
     character.display_stat_chart()
+
+    
+
+def characters_to_df(chars):
+    data = []
+    for c in chars:
+        data.append({
+            "name": c.name,
+            "race": c.race,
+            "class": c.classType,
+            "level": c.level,
+            "xp": c.xp,
+            "strength": c.str,
+            "dexterity": c.dex,
+            "constitution": c.const,
+            "intelligence": c.int,
+            "wisdom": c.wis,
+            "charisma": c.char,
+            "weapon": c.weapon
+        })
+    return p.DataFrame(data)
+
+def character_comparison(chars):
+    while True:
+        df = characters_to_df(chars)
+        print(" ")
+        print("1. Print Data")
+        print("2. Print Nerd Data")
+        print("3. Get Highest")
+        print("4. Get Stat Averages")
+        print("5. Visualize All Data")
+        print("6. Quit")
+        print(" ")
+        option = pf.idiot_proof_num_range("Type the numbered option ", 1, 6)
+        print(" ")
+
+        match option:
+            case 1:
+                print(df)
+            case 2:
+                print(df.describe())
+            case 3:
+                print("1. Level")
+                print("2. Strength")
+                print("3. Dexterity")
+                print("4. Constitution")
+                print("5. Intelligence")
+                print("6. Wisdom")
+                print("7. Charisma")
+                print(" ")
+                option2 = pf.idiot_proof_num_range("Type the numbered option ", 1, 7)
+                print(" ")
+
+                stat = ""
+                match option2:
+                    case 1: stat = "level"
+                    case 2: stat = "strength"
+                    case 3: stat = "dexterity"
+                    case 4: stat = "constitution"
+                    case 5: stat = "intelligence"
+                    case 6: stat = "wisdom"
+                    case 7: stat = "charisma" 
+
+                idx = df[stat].idxmax()
+                row = df.loc[idx]
+                print(f"{row["name"]}: {stat.capitalize()} {row[stat]}") 
+            case 4:
+                avg_stats = df[[
+                    "strength", "dexterity", "constitution",
+                    "intelligence", "wisdom", "charisma"
+                ]].mean() 
+
+                stats = [avg_stats["strength"], avg_stats["dexterity"], avg_stats["constitution"], avg_stats["intelligence"], avg_stats["wisdom"], avg_stats["charisma"]]
+                labels = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"]
+
+                avg_stats.index = [s.capitalize() for s in avg_stats.index]
+                avg_stats.plot(kind="bar")
+
+                m.title("Average Stats")
+                m.show()
+            case 5:
+                stats_df = df[[
+                    "name",
+                    "strength", "dexterity", "constitution",
+                    "intelligence", "wisdom", "charisma"
+                ]]
+
+                stats_df = stats_df.set_index("name")
+
+                stats_df.plot(kind="bar")
+
+                m.title("All Character Stats")
+                m.ylabel("Stat Value")
+                m.xticks(rotation=45)
+                m.tight_layout()
+                m.show()
+            case 6: break
 
 
 def display_all(chars):
