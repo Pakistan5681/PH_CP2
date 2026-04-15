@@ -110,7 +110,7 @@ reloadTime = 15
 # Bullets
 bullets = []
 bulletSpeed = 10
-bulletPierce = 2
+bulletPierce = 1
 
 # Enemies
 regfoes = []
@@ -278,7 +278,7 @@ while running:
     fullnew = []
     bulletColliders = []
     for i in bullets:
-        new = Bullet(round(i.x + i.velX), round(i.y+ i.velY), py.Rect(i.x, i.y, 20, 20), i.velX, i.velY, bulletPierce)
+        new = Bullet(round(i.x + i.velX), round(i.y + i.velY), py.Rect(i.x, i.y, 20, 20), i.velX, i.velY, i.remainingPierce)
         py.draw.ellipse(screen, BLACK, (new.x, new.y, 20, 20))   
         fullnew.append(new)
 
@@ -332,24 +332,21 @@ while running:
         regfoes = fullnew
 
     # Checks for bullet-enemy collisions
-    for i in bullets:
-        for j in regfoes:
-            if j.collider.colliderect(i.collider):
-                enemy = j
-                proj = i
-
-                regfoes.remove(j)
-
-                for k in bullets:
-                    if k.x == proj.x and k.y == proj.y:
-                        if k.pierce > 1:
-                            bullets.remove(k)
-                            proj.pierce -= 1
-                            bullets.append(proj)
-                        else:
-                            bullets.remove(k)
-                        
+    bullets_to_remove = set()
+    foes_to_remove = set()
+    
+    for i, bullet in enumerate(bullets):
+        for j, foe in enumerate(regfoes):
+            if foe.collider.colliderect(bullet.collider) and j not in foes_to_remove:
+                foes_to_remove.add(j)
                 xp += knowledge
+                bullet.remainingPierce -= 1
+                if bullet.remainingPierce <= 0:
+                    bullets_to_remove.add(i)
+    
+    bullets = [b for i, b in enumerate(bullets) if i not in bullets_to_remove]
+    regfoes = [f for j, f in enumerate(regfoes) if j not in foes_to_remove]
+                        
     # Draws the healthbar
     for i in range(maxHealth):
         if i + 1 > health:

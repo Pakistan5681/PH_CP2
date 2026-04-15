@@ -1,0 +1,389 @@
+import pygame as py
+from random import choice, randint
+
+class Upgrade:
+    def __init__(self, name, stat, amount, rarity, description):
+        self.name = name
+        self.stat = stat
+        self.amount = amount
+        self.rarity = rarity
+        self.description = description
+
+class Enemy:
+    def __init__(self, x, y, collider, velX, velY, speed, health):
+        self.x = x
+        self.y = y
+        self.collider = collider
+        self.velX = velX
+        self.velY = velY
+        self.speed = speed
+        self.health = health
+
+class Bullet:
+    def __init__(self, x, y, collider, velX, velY, pierce):
+        self.x = x
+        self.y = y
+        self.collider = collider
+        self.velX = velX
+        self.velY = velY
+        self.pierce = pierce
+        self.remainingPierce = pierce
+
+def rungame(root):
+    root.destroy()
+    py.init()
+
+    potUpgradesRaw = [
+        Upgrade("Vitality", "Max Health", 1, "common", "Increases Max Health by 1"),
+        Upgrade("Big Vitality", "Max Health", 2, "rare", "Increases Max Health by 2"),
+        Upgrade("Huge Vitality", "Max Health", 3, "epic", "Increases Max Health by 3"),
+        Upgrade("Pakistinian Vitality", "Max Health", 5, "pakistinian", "Increases Max Health by 5"),
+        Upgrade("Haste", "Player Speed", 1, "common", "Increases Speed by 1"),
+        Upgrade("Quick", "Player Speed", 2, "rare", "Increases Speed by 2"),
+        Upgrade("Lightning Fast", "Player Speed", 3, "epic", "Increases Speed by 3"),
+        Upgrade("Speed of Pakistan", "Player Speed", 5, "pakistinian", "Increases Speed by 5"),
+        Upgrade("Quick Hands", "Reload Time", 0.9, "common", "Increases Reload Speed"),
+        Upgrade("Dexterous", "Reload Time", 0.8, "rare", "Greatly Increases Reload Speed"),
+        Upgrade("Reloader", "Reload Time", 0.7, "epic", "Massively Increases Reload Speed"),
+        Upgrade("Pakistinian Dexterity", "Reload Time", 0.55, "pakistinian", "Increases Reload Speed to an Unreasonable Degree"),
+        Upgrade("Full Heal", "Full Heal", 0, "common", "Recovers All Health"),
+        Upgrade("Better Gunpowder", "Bullet Speed", 2, "common", "Increases Bullet Speed"),
+        Upgrade("Boom Juice", "Bullet Speed", 4, "rare", "Greatly Increases Bullet Speed"),
+        Upgrade("Max Propulsion", "Bullet Speed", 6, "epic", "Massively Increases Bullet Speed"),
+        Upgrade("Speed of Light", "Bullet Speed", 10, "pakistinian", "Bullets go the speed of light"),
+        Upgrade("Smarts", "Knowledge", 1, "common", "Increases XP per kill by 1"),
+        Upgrade("Intelligent", "Knowledge", 2, "rare", "Increases XP per kill by 2"),
+        Upgrade("Genius", "Knowledge", 3, "epic", "Increases XP per kill by 3"),
+        Upgrade("Infinite Wisdom", "Knowledge", 5, "pakistinian", "Increases XP per kill by 5"),
+        Upgrade("Pointy Projectiles", "Pierce", 1, "common", "Increases bullet pierce by 1"),
+        Upgrade("Blade Bullets", "Pierce", 2, "rare", "Increases bullet pierce by 2"),
+        Upgrade("Sharp Shooting", "Pierce", 3, "epic", "Increases bullet pierce by 3"),
+        Upgrade("Pakistinian Pew-Pew", "Pierce", 4, "pakistinian", "Increases bullet pierce by 4"),
+    ]
+
+    potUpgrades = []
+
+    # Converts the rarity of upgrades into option weights
+    for i in potUpgradesRaw:
+        match i.rarity:
+            case "common":
+                for j in range(10): potUpgrades.append(i)
+            case "rare":
+                for j in range(5): potUpgrades.append(i)
+            case "epic":
+                for j in range(3): potUpgrades.append(i)
+            case "pakistinian":
+                for j in range(1): potUpgrades.append(i)
+
+    # Screen Parameters
+    SCREEN_WIDTH = 1920
+    SCREEN_HEIGHT = 1080
+
+    # Colors
+    RED = (255, 0, 0)
+    BLACK = (0, 0, 0)
+    GREEN = (6, 69, 23)
+    BROWN = (82, 49, 2)
+    PLAYER_COLOR = (242, 177, 97)
+    SKY_BLUE = (2, 78, 122)
+    YELLOW = (194, 177, 27)
+    WHITE = (255, 255, 255)
+    GREY = (79, 79, 79)
+    XP_GREEN = (0, 255, 38)
+    BLUE = (7, 0, 112)
+    PURPLE = (143, 0, 214)
+
+    # Pygame Setup
+    running = True
+    screen = py.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    clock = py.time.Clock()
+    py.display.set_caption("Pakistan's Bombastic Rougelike")
+
+    # Player
+    playerX = SCREEN_WIDTH / 2
+    playerY = SCREEN_HEIGHT / 2
+    playerSpeed = 4
+
+    # Gun Reloading
+    reloading = False
+    reloadClock = 0
+    reloadTime = 15
+
+    # Bullets
+    bullets = []
+    bulletSpeed = 10
+    bulletPierce = 1
+
+    # Enemies
+    regfoes = []
+    regColliders = []
+    regSpawnClock = 0
+    regFoeSpeed = 2
+    acceleration = 0.067
+
+    # Spawn Rate
+    regSpawnTime = 20
+    regSpawnIncreaseTime = 420
+    regSpawnIncreaseClock = 0
+    minSpawnTime = 2
+
+    # Health
+    maxHealth = 3
+    health = 3
+
+    # XP
+    xp = 0
+    upgradeReq = 10
+    knowledge = 1 
+    xp_bar_lengnth = 500
+    xp_bar_start = 25
+
+    # Text
+    font = py.font.Font(None, 36)
+    bigFont = py.font.Font(None, 72)
+
+    def getColor(rarity): # Returns a color based on rarity (for upgrade cards)
+        match rarity:
+            case "common": return GREY
+            case "rare": return BLUE
+            case "epic": return PURPLE
+            case "pakistinian": return YELLOW
+
+    def get_foe_pos(): # For spawning enemies; spawns an enemy outside of the screen
+        SCREEN_WIDTH
+        SCREEN_HEIGHT
+    
+        out = []
+    
+        spawnOption = ["above", "below"] 
+        option = choice(spawnOption)
+    
+        if option == "above":
+            out.append(-150)
+        else:
+            out.append(SCREEN_WIDTH + 150)
+
+        option = choice(spawnOption)
+
+        out.append(randint(-150, SCREEN_HEIGHT + 150))
+
+        return out
+
+    def LevelUpOptions(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce): # Runs all logic for upgrading the player
+        running = True
+
+        def applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce, stat, amount): # Actually applies the upgrades
+            match stat:
+                case "Max Health":
+                    maxHealth += amount
+                    playerHealth += amount
+                case "Player Speed":
+                    playerSpeed += amount
+                case "Reload Time":
+                    bulletReload *= amount
+                case "Full Heal":
+                    playerHealth = maxHealth
+                case "Bullet Speed":
+                    bulletSpeed += amount
+                case "Knowledge":
+                    knowledge += amount
+                case "Pierce":
+                    pierce += amount
+
+            return playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce
+
+        # Setup
+        upgrades = []
+        rects = []
+        for i in range(3): 
+            upgrades.append(choice(potUpgrades))
+            rect = py.Rect(i * (SCREEN_WIDTH / 3) + 12, 100, (SCREEN_WIDTH / 3) - 25, SCREEN_HEIGHT - 200)
+            rects.append(rect)
+
+        while running:
+            # Title Text 
+            screen.fill(WHITE)
+            texty = bigFont.render("Choose An Upgrade!", True, BLACK)
+            screen.blit(texty, (25, 25, SCREEN_WIDTH - 50, 50))
+
+            # Draws the upgrade boxes
+            for i in range(3):   
+                color = getColor(upgrades[i].rarity)
+                py.draw.rect(screen, color, rects[i])
+
+                text_surface = font.render(upgrades[i].name, True, WHITE)
+                screen.blit(text_surface, (i * (SCREEN_WIDTH / 3) + 25, 200, (SCREEN_WIDTH / 3) - 75, 100))
+
+                text_surface_two = font.render(upgrades[i].description, True, WHITE)
+                screen.blit(text_surface_two, (i * (SCREEN_WIDTH / 3) + 25, 300, (SCREEN_WIDTH / 3) - 75, 100))
+
+            # Checks to see if any of the boxes have been selected
+            for event in py.event.get():
+                if event.type == py.MOUSEBUTTONDOWN:
+                    if rects[0].collidepoint(event.pos):
+                        return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce, upgrades[0].stat, upgrades[0].amount)
+                    elif rects[1].collidepoint(event.pos):
+                        return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce, upgrades[1].stat, upgrades[1].amount)
+                    elif rects[2].collidepoint(event.pos):
+                        return applyUpgrade(playerSpeed, playerHealth, maxHealth, bulletReload, bulletSpeed, knowledge, pierce, upgrades[2].stat, upgrades[2].amount)
+                elif event.type == py.QUIT:
+                    running = False 
+
+            py.display.flip()
+
+
+    while running:
+        clock.tick(60)
+
+        for event in py.event.get():
+                if event.type == py.QUIT:
+                    running = False 
+
+        keys = py.key.get_pressed()
+        screen.fill(SKY_BLUE)
+
+        # Player movement
+        if keys[py.K_a]:
+            playerX -= playerSpeed
+        if keys[py.K_d]:
+            playerX += playerSpeed
+        if keys[py.K_w]:
+            playerY -= playerSpeed
+        if keys[py.K_s]:
+            playerY += playerSpeed
+
+        # Prevents the player from going out of bounds
+        if playerX < 0: playerX = 0
+        if playerX > SCREEN_WIDTH: playerX = SCREEN_WIDTH
+        if playerY < 0: playerY = 0
+        if playerY > SCREEN_HEIGHT: playerY = SCREEN_HEIGHT
+
+        #Bullet firing
+        player_pos = py.math.Vector2(playerX, playerY)
+        mouse_pos = py.math.Vector2(py.mouse.get_pos())
+        direction = mouse_pos - player_pos
+        direction = direction.normalize() * bulletSpeed   
+
+        if keys[py.K_SPACE] and not reloading:
+            bullets.append(Bullet(playerX + 50, playerY + 50, py.Rect(playerX, playerY, 20, 20), direction.x, direction.y, bulletPierce))
+            reloading = True
+            reloadClock = 0
+
+        # Fire cooldown
+        if reloading:
+            reloadClock += 1
+            if reloadClock >= reloadTime:
+                reloading = False
+
+        # Bullet movement
+        fullnew = []
+        bulletColliders = []
+        for i in bullets:
+            new = Bullet(round(i.x + i.velX), round(i.y + i.velY), py.Rect(i.x, i.y, 20, 20), i.velX, i.velY, i.remainingPierce)
+            py.draw.ellipse(screen, BLACK, (new.x, new.y, 20, 20))   
+            fullnew.append(new)
+
+        bullets = fullnew
+
+        # Enemy spawning
+        regSpawnClock += 1
+        if regSpawnClock >= regSpawnTime:
+            pos = get_foe_pos()
+            regfoes.append(Enemy(pos[0], pos[1], py.Rect(pos[0], pos[1], 50, 50), 0, 0, 2, 2))
+            regSpawnClock = 0 
+    
+        fullnew = [] 
+        regColliders = [] 
+
+        # Enemy Spawnrate
+        if regSpawnTime > minSpawnTime:
+            regSpawnIncreaseClock += 1
+            if regSpawnIncreaseClock >= regSpawnIncreaseTime:
+                regSpawnIncreaseClock = 0
+                regSpawnTime -= 1
+
+        print(regSpawnTime)
+    
+        # Enemy movement 
+        for i in regfoes: 
+            new = i 
+            if playerX < i.x: 
+                new.velX -= acceleration 
+            elif playerX > i.x: 
+                new.velX += acceleration 
+            if playerY < i.y: 
+                new.velY -= acceleration 
+            elif playerY > i.y: 
+                new.velY += acceleration 
+
+            if new.velX > regFoeSpeed: new.velX = regFoeSpeed 
+            if new.velX < -regFoeSpeed: new.velX = -regFoeSpeed
+            if new.velY > regFoeSpeed: new.velY = regFoeSpeed 
+            if new.velY < -regFoeSpeed: new.velY = -regFoeSpeed
+
+            new.x += new.velX
+            new.y += new.velY
+
+            new.collider = py.Rect(new.x, new.y, 50, 50)
+    
+            fullnew.append(new) 
+    
+            py.draw.ellipse(screen, BLACK, (new.x, new.y, 50, 50))  
+
+            regfoes = fullnew
+
+        # Checks for bullet-enemy collisions
+        bullets_to_remove = set()
+        foes_to_remove = set()
+
+        for i, bullet in enumerate(bullets):
+            for j, foe in enumerate(regfoes):
+                if foe.collider.colliderect(bullet.collider) and j not in foes_to_remove:
+                    foes_to_remove.add(j)
+                    xp += knowledge
+                    bullet.remainingPierce -= 1
+                    if bullet.remainingPierce <= 0:
+                        bullets_to_remove.add(i)
+
+        bullets = [b for i, b in enumerate(bullets) if i not in bullets_to_remove]
+        regfoes = [f for j, f in enumerate(regfoes) if j not in foes_to_remove]
+
+        # Draws the healthbar
+        for i in range(maxHealth):
+            if i + 1 > health:
+                py.draw.ellipse(screen, GREY, (25 + (i * 37), 25, 25, 25))
+            else:
+                py.draw.ellipse(screen, RED, (25 + (i * 37), 25, 25, 25))
+
+        playerCollider = py.Rect(playerX, playerY, 100, 100)
+
+        # Checks for player-enemy collisions
+        for i in regfoes:
+            if i.collider.colliderect(playerCollider):
+                health -= 1
+                regfoes.remove(i)
+
+        # Draws the XP bar
+        for i in range(upgradeReq):
+            if i + 1 > xp:
+                py.draw.rect(screen, GREY, (xp_bar_start + (i * (xp_bar_lengnth / upgradeReq)), 75, (xp_bar_lengnth / upgradeReq), 25))
+            else:
+                py.draw.rect(screen, XP_GREEN, (xp_bar_start + (i * (xp_bar_lengnth / upgradeReq)), 75, (xp_bar_lengnth / upgradeReq), 25))
+
+        surface = font.render(f"{xp}/{upgradeReq}", True, WHITE)
+        screen.blit(surface, (xp_bar_start, 75, xp_bar_lengnth, 25))
+
+        # Upgrade Logic
+        if xp >= upgradeReq:
+            xp = 0
+            upgradeReq = round(upgradeReq * 1.25)
+            playerSpeed, health, maxHealth, reloadTime, bulletSpeed, knowledge, bulletPierce = LevelUpOptions(playerSpeed, health, maxHealth, reloadTime, bulletSpeed, knowledge, bulletPierce)
+
+        # kills the player
+        if health <= 0:
+            running = False
+
+        print(bulletPierce)
+
+        py.draw.ellipse(screen, WHITE, (playerX, playerY, 100, 100))
+        if running: py.display.flip()
